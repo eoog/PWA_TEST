@@ -99,7 +99,7 @@ async function showNotification(title, options) {
 async function handleBackgroundSync() {
   // 백그라운드에서 실행할 작업
     // 반복문을 사용하여 작업 실행
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 15; i++) {
       // 각 반복에서 작업 수행
       console.log(`Background task ${i} executed.`);
 
