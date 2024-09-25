@@ -70,3 +70,48 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+
+self.addEventListener('install', (event) => {
+  console.log('인스톨');
+});
+
+self.addEventListener('activate', (event) => {
+  console.log('액티브');
+});
+
+self.addEventListener('fetch', (event) => {
+  console.log('페치:', event.request.url);
+  // 필요한 경우 캐시 처리 추가
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(handleBackgroundSync());
+  }
+});
+
+// 알림
+
+async function showNotification(title, options) {
+  await self.registration.showNotification(title, options);
+}
+
+async function handleBackgroundSync() {
+  // 백그라운드에서 실행할 작업
+    // 반복문을 사용하여 작업 실행
+    for (let i = 1; i <= 100; i++) {
+      // 각 반복에서 작업 수행
+      console.log(`Background task ${i} executed.`);
+
+      // 잠시 대기 (예: API 요청을 시뮬레이션)
+      // 잠시 대기 (예: API 요청을 시뮬레이션)
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+
+  // 작업이 완료되면 알림 표시
+  showNotification('작업 완료', {
+    body: `백그라운드 작업 ${i} 이 완료되었습니다.`,
+    icon: '/src/logo.svg' // 알림 아이콘 경로
+  });
+    }
+}
