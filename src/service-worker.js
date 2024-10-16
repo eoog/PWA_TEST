@@ -75,6 +75,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
       caches.open('my-cache').then(cache => {
         return cache.addAll([
+          '/index.html',
+          '/main.js',
+          '/style.css',
+          '/logo.png',
           '/nude.onnx'
         ]);
       })
@@ -88,6 +92,17 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   console.log('페치:', event.request.url);
+  event.respondWith(
+      caches.match(event.request).then(response => {
+        // 캐시에 있으면 반환하고, 없으면 네트워크에서 가져와 캐시에 저장
+        return response || fetch(event.request).then(networkResponse => {
+          return caches.open('my-cache').then(cache => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        });
+      })
+  );
   // 필요한 경우 캐시 처리 추가
 });
 
