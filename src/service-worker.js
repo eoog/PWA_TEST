@@ -64,14 +64,22 @@ registerRoute(
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', async (event) => {
-  if (event.data && event.data.type === 'GET_CURRENT_URL') {
-    const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    allClients.forEach(client => {
-      console.log('Current URL:', client.url);
-      // 추가 처리가 필요하다면 이곳에 작성
+  // event.data가 존재하고 GET_CLIENT_URLS 타입일 경우
+  if (event.data && event.data.type === 'GET_CLIENT_URLS') {
+    // 모든 클라이언트 가져오기
+    const allClients = await clients.matchAll({
+      includeUncontrolled: true,
+      type: 'window',
     });
+
+    // 각 클라이언트의 URL 배열 생성
+    const urls = allClients.map(client => client.url);
+
+    // 클라이언트에 URL 배열을 응답으로 전송
+    event.ports[0].postMessage(urls);
   }
 });
+
 
 // Any other custom service worker logic can go here.
 
