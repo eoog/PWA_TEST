@@ -64,18 +64,17 @@ registerRoute(
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', async (event) => {
-  // event.data가 존재하고 GET_CLIENT_URLS 타입일 경우
   if (event.data && event.data.type === 'GET_CLIENT_URLS') {
-    // 모든 클라이언트 가져오기
+    // 모든 클라이언트를 가져온다.
     const allClients = await clients.matchAll({
       includeUncontrolled: true,
       type: 'window',
     });
 
-    // 각 클라이언트의 URL 배열 생성
+    // 각 클라이언트의 URL을 배열로 생성
     const urls = allClients.map(client => client.url);
 
-    // 클라이언트에 URL 배열을 응답으로 전송
+    // 요청한 클라이언트에 URL 배열을 응답으로 전송
     event.ports[0].postMessage(urls);
   }
 });
