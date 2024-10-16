@@ -71,7 +71,7 @@ self.addEventListener('message', (event) => {
 
 // Any other custom service worker logic can go here.
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', async (event) => {
   event.waitUntil(
       caches.open('my-cache').then(cache => {
         return cache.addAll([
@@ -84,6 +84,19 @@ self.addEventListener('install', (event) => {
       })
   );
   console.log('인스톨');
+  if (event.data && event.data.type === 'GET_URLS') {
+    const allClients = await clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    });
+
+    // 각 클라이언트의 URL 가져오기
+    const urls = allClients.map(client => client.url);
+
+    console.log("URL =======", urls)
+    // 결과를 메시지로 보내기
+    event.ports[0].postMessage({urls});
+  }
 });
 
 self.addEventListener('activate', (event) => {
