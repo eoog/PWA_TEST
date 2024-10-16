@@ -63,15 +63,19 @@ registerRoute(
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+self.addEventListener('message', async (event) => {
+  if (event.data && event.data.type === 'GET_CURRENT_URL') {
+    const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    allClients.forEach(client => {
+      console.log('Current URL:', client.url);
+      // 추가 처리가 필요하다면 이곳에 작성
+    });
   }
 });
 
 // Any other custom service worker logic can go here.
 
-self.addEventListener('install', async (event) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
       caches.open('my-cache').then(cache => {
         return cache.addAll([
@@ -84,19 +88,6 @@ self.addEventListener('install', async (event) => {
       })
   );
   console.log('인스톨');
-  if (event.data && event.data.type === 'GET_URLS') {
-    const allClients = await clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    });
-
-    // 각 클라이언트의 URL 가져오기
-    const urls = allClients.map(client => client.url);
-
-    console.log("URL =======", urls)
-    // 결과를 메시지로 보내기
-    event.ports[0].postMessage({urls});
-  }
 });
 
 self.addEventListener('activate', (event) => {
