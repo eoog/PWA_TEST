@@ -72,6 +72,13 @@ self.addEventListener('message', (event) => {
 // Any other custom service worker logic can go here.
 
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+      caches.open('my-cache').then(cache => {
+        return cache.addAll([
+          '/nude.onnx'
+        ]);
+      })
+  );
   console.log('인스톨');
 });
 
