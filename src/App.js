@@ -1,35 +1,51 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import YOLOv8ObjectDetection from "./YOLOv8ObjectDetection";
-
+const channel = new BroadcastChannel('url_channel');
 
 
 function App() {
 
+  const [urls, setUrls] = useState([]);
+
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
-        const messageChannel = new MessageChannel();
+    // 현재 URL을 저장
+    const currentUrl = window.location.href;
+    const storedUrls = JSON.parse(localStorage.getItem('urls')) || [];
 
-        // 서비스 워커에 메시지 전송
-        registration.active.postMessage(
-            { type: 'GET_CLIENT_URLS' },
-            [messageChannel.port2]
-        );
-
-        // 서비스 워커로부터 메시지 수신
-        messageChannel.port1.onmessage = (event) => {
-          const urls = event.data;
-          console.log('Opened URLs:', urls);
-          // 여기에 URL들을 사용하여 추가적인 로직을 구현할 수 있습니다.
-        };
-      });
+    // 새로운 URL 추가
+    if (!storedUrls.includes(currentUrl)) {
+      storedUrls.push(currentUrl);
+      localStorage.setItem('urls', JSON.stringify(storedUrls));
     }
+
+    // 저장된 URL 목록 업데이트
+    setUrls(storedUrls);
+
+    // 클린업: 페이지를 떠날 때 URL 제거
+    const handleBeforeUnload = () => {
+      const updatedUrls = storedUrls.filter(url => url !== currentUrl);
+      localStorage.setItem('urls', JSON.stringify(updatedUrls));
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   return (
-    <YOLOv8ObjectDetection />
-  );
+      <>
+      <ul>
+        {urls.map((url, index) => (
+            <li key={index}>{url}</li>
+        ))}
+      </ul>
+  <YOLOv8ObjectDetection/>
+      </>
+)
+  ;
 }
 
 export default App;
