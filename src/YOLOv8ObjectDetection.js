@@ -20,55 +20,51 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     setBoxes(detectedBoxes);
   };
 
+  const [lastAlertTime, setLastAlertTime] = useState(0); // 마지막 경고 시간 저장
+
   const drawImageAndBoxes = (file, boxes) => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
 
-    // onload 이벤트를 바깥에서 정의하여 이미지를 그린 후에는 한 번만 실행되도록 설정
     const onLoadHandler = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      ctx.strokeStyle = "#00FF00";
+      ctx.lineWidth = 3;
+      ctx.font = "18px serif";
 
-      // 1초 딜레이 후 이미지와 박스 그리기
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        ctx.strokeStyle = "#00FF00";
-        ctx.lineWidth = 3;
-        ctx.font = "18px serif";
+      let alertDisplayed = false;
 
-      let alertDisplayed = false; // alertDisplayed 변수를 함수 안에서 선언
-      let lastAlertTime = 0; // 마지막 알림 시간을 저장할 변수
+      // 특정 클래스에 해당하는 박스만 그리기
+      boxes.forEach(([x1, y1, x2, y2, label]) => {
+        if (shouldDrawBox(label)) { // 특정 클래스 필터링
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+          ctx.fillStyle = "#00ff00";
+          const width = ctx.measureText(label).width;
+          ctx.fillRect(x1, y1, width + 10, 25);
+          ctx.fillStyle = "#000000";
+          ctx.fillText(label, x1, y1 + 18);
+          alertDisplayed = true;
+        }
+      });
 
-        // 특정 클래스에 해당하는 박스만 그리기
-        boxes.forEach(([x1, y1, x2, y2, label]) => {
-          if (shouldDrawBox(label)) { // 특정 클래스 필터링
-            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-            ctx.fillStyle = "#00ff00";
-            const width = ctx.measureText(label).width;
-            ctx.fillRect(x1, y1, width + 10, 25);
-            ctx.fillStyle = "#000000";
-            ctx.fillText(label, x1, y1 + 18);
-            alertDisplayed = true;
-          }
-        });
-
-
-        // 2초 이내 호출 무시
-        if (alertDisplayed) {
-          handleMessage();
-          alertDisplayed = false;
-          }
-
+      // 2초 이내 중복 호출 방지
+      const currentTime = Date.now();
+      if (alertDisplayed && currentTime - lastAlertTime > 5000) {
+        handleMessage();
+        setLastAlertTime(currentTime); // 마지막 경고 시간을 업데이트
+      }
 
       const dataURL = canvas.toDataURL('image/png');
       localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
-        // onload 이벤트 리스너 제거
-        img.onload = null; // 더 이상 필요 없으므로 제거
+
+      img.onload = null; // onload 이벤트 리스너 제거
     };
 
-    img.onload = onLoadHandler; // 이미지 로드가 완료되면 onLoadHandler 실행
-
+    img.onload = onLoadHandler; // 이미지 로드 완료 후 onLoadHandler 실행
   };
 
   const handleMessage = async () => {

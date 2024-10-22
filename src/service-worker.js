@@ -123,7 +123,7 @@ async function handleBackgroundSync() {
   // 백그라운드에서 실행할 작업
     // 반복문을 사용하여 작업 실행
   // 작업이 완료되면 알림 표시
-  await showNotification('작업 완료', {
+  await showNotification('[선정성]', {
     body: `[선정성] - 선정성이 검출되었습니다.`,
     icon: '/src/meer.ico' // 알림 아이콘 경로
   });
