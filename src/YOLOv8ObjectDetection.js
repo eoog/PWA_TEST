@@ -51,7 +51,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
             // 경고 메시지를 한 번만 띄우기
             if (!alertDisplayed) {
-              alert("검출된 객체가 있습니다!"); // 경고 메시지
               alertDisplayed = true; // 경고 메시지가 표시되었다고 설정
               handleMessage();
             }
@@ -62,22 +61,22 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   };
 
   const handleMessage = () => {
+    console.log("하하하")
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/src/service-worker.js')
-      .then(registration => {
-        console.log('서비스 워커 등록 성공:', registration);
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('/service-worker.js');
+          console.log('Service Worker registered with scope:', registration.scope);
 
-        // 서비스 워커가 준비되면 메시지 전송
-        registration.ready.then(function (registration) {
           // 서비스 워커에 메시지 보내기
-          registration.active.postMessage({ type: 'START_BACKGROUND_SYNC' });
-        });
-      })
-      .catch(error => {
-        console.error('서비스 워커 등록 실패:', error);
+
+          registration.active.postMessage({ type: 'BACKGROUND_SYNC' });
+
+        } catch (error) {
+          console.error('Service Worker registration failed:', error);
+        }
       });
     }
-
   }
 
 

@@ -12,6 +12,7 @@ async function requestNotificationPermission() {
     console.log('Notification permission granted.');
   } else {
     console.log('Notification permission denied.');
+    alert("알림 허용을 해주세요.")
   }
 
 
@@ -21,21 +22,6 @@ function App() {
   const [capturedFile, setCapturedFile] = useState(null); // 캡처된 파일 상태
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('/service-worker.js');
-          console.log('Service Worker registered with scope:', registration.scope);
-
-          // 서비스 워커에 메시지 보내기
-
-            registration.active.postMessage({ type: 'BACKGROUND_SYNC' });
-
-        } catch (error) {
-          console.error('Service Worker registration failed:', error);
-        }
-      });
-    }
     requestNotificationPermission()
   }, []);
 
