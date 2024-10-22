@@ -36,10 +36,11 @@ function sendUrlsAndContentToPWA(data) {
   }
 }
 
-// 모든 탭의 정보 수집 함수
+// 활성화된 탭의 정보 수집 함수
 async function collectTabsData() {
   try {
-    const tabs = await chrome.tabs.query({});
+    // 현재 활성화된 탭 정보 수집
+    const tabs = await chrome.tabs.query({active: true});
     const tabsData = [];
     
     for (const tab of tabs) {
