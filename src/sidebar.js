@@ -71,6 +71,9 @@ export default function Example() {
             <Link to="/">
             <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>
             </Link>
+            <Link to="/a">
+              <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>
+            </Link>
             {/*<Link to="/a">*/}
             {/*  <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>*/}
             {/*</Link>*/}
