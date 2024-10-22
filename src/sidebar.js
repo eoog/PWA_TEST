@@ -13,6 +13,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import {Link} from "react-router-dom";
 
 export default function Example() {
   const { collapseSidebar, collapsed } = useProSidebar();
@@ -67,7 +68,12 @@ export default function Example() {
                   </Box>
                 </Fade>
             )}
+            <Link to="/">
             <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>
+            </Link>
+            {/*<Link to="/a">*/}
+            {/*  <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>*/}
+            {/*</Link>*/}
             {/*<SubMenu icon={<FolderSharedIcon />} label="Projects">*/}
             {/*  <MenuItem icon={<ArticleIcon />}> Project 1</MenuItem>*/}
             {/*  <MenuItem icon={<ArticleIcon />}> Project-Project-Project</MenuItem>*/}

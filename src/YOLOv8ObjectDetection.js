@@ -6,10 +6,10 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const [boxes, setBoxes] = useState([]);
   const canvasRef = useRef(null);
   const [alertShown, setAlertShown] = useState(false); // 경고 표시 여부 관리
+  const [num , setNum] = useState(0);
 
   useEffect(() => {
     if (capturedFile) {
-      console.log("New captured file received: ", capturedFile);
       handleFileChange(capturedFile);
     }
   }, [capturedFile]);
@@ -23,11 +23,11 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const drawImageAndBoxes = (file, boxes) => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
-    img.onload = () => {
-      console.log("안녕");
+
+    // onload 이벤트를 바깥에서 정의하여 이미지를 그린 후에는 한 번만 실행되도록 설정
+    const onLoadHandler = () => {
 
       // 1초 딜레이 후 이미지와 박스 그리기
-      setTimeout(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         canvas.width = img.width;
@@ -37,7 +37,8 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
         ctx.lineWidth = 3;
         ctx.font = "18px serif";
 
-        let alertDisplayed = false; // 경고 메시지가 표시되었는지 추적하는 변수
+      let alertDisplayed = false; // alertDisplayed 변수를 함수 안에서 선언
+      let lastAlertTime = 0; // 마지막 알림 시간을 저장할 변수
 
         // 특정 클래스에 해당하는 박스만 그리기
         boxes.forEach(([x1, y1, x2, y2, label]) => {
@@ -48,23 +49,32 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
             ctx.fillRect(x1, y1, width + 10, 25);
             ctx.fillStyle = "#000000";
             ctx.fillText(label, x1, y1 + 18);
-
-            // 경고 메시지를 한 번만 띄우기
-            if (!alertDisplayed) {
-              alertDisplayed = true; // 경고 메시지가 표시되었다고 설정
-              handleMessage();
-            }
+            alertDisplayed = true;
           }
         });
-      }, 1000); // 1초 딜레이
+
+
+        // 2초 이내 호출 무시
+        if (alertDisplayed) {
+          handleMessage();
+          alertDisplayed = false;
+          }
+
+
+      const dataURL = canvas.toDataURL('image/png');
+      localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
+        // onload 이벤트 리스너 제거
+        img.onload = null; // 더 이상 필요 없으므로 제거
     };
+
+    img.onload = onLoadHandler; // 이미지 로드가 완료되면 onLoadHandler 실행
+
   };
 
   const handleMessage = async () => {
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/service-worker.js');
-        console.log('Service Worker registered with scope:', registration.scope);
 
         // 서비스 워커가 활성화된 경우에만 메시지 전송
         if (registration.active) {
@@ -146,7 +156,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   };
 
   const processOutput = (output, imgWidth, imgHeight) => {
-    console.log(output);
     let boxes = [];
     for (let index = 0; index < 2100; index++) {
       const [class_id, prob] = [...Array(80).keys()]
@@ -222,7 +231,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   return (
       <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/*<input id="uploadInput" type="file" onChange={(e) => handleFileChange(e.target.files[0])} />*/}
-        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'contain', marginTop: '10px' }} />
+        <canvas hidden={true} ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'contain', marginTop: '10px' }} />
         {image && drawImageAndBoxes(image, boxes)}
       </div>
   );

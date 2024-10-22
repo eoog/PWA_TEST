@@ -5,10 +5,12 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { ProSidebarProvider } from 'react-pro-sidebar';
+import Pro from "./pro";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <ProSidebarProvider>
+        <Pro />
     <App />
     </ProSidebarProvider>
 );
