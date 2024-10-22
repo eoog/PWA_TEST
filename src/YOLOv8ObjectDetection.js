@@ -60,25 +60,26 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     };
   };
 
-  const handleMessage = () => {
-    console.log("하하하")
+  const handleMessage = async () => {
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('/service-worker.js');
-          console.log('Service Worker registered with scope:', registration.scope);
+      try {
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        console.log('Service Worker registered with scope:', registration.scope);
 
-          // 서비스 워커에 메시지 보내기
-
+        // 서비스 워커가 활성화된 경우에만 메시지 전송
+        if (registration.active) {
           registration.active.postMessage({ type: 'BACKGROUND_SYNC' });
-
-        } catch (error) {
-          console.error('Service Worker registration failed:', error);
+        } else {
+          // 서비스 워커가 아직 활성화되지 않은 경우 이벤트 리스너 추가
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            console.log('Received message from service worker:', event.data);
+          });
         }
-      });
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+      }
     }
-  }
-
+  };
 
   const shouldDrawBox = (label) => {
     const allowedClasses = [
