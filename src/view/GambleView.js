@@ -3,7 +3,7 @@ import YOLOv8ObjectDetection from "../YOLOv8ObjectDetection";
 
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
-const Br = () => {
+const GambleView = () => {
     const [urlHistory, setUrlHistory] = useState([]);
 
     // 데이터 요청 함수
@@ -81,4 +81,4 @@ const Br = () => {
 };
 
 
-export default Br;
+export default GambleView;

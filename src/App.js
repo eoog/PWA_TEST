@@ -4,7 +4,7 @@ import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다
 import { Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Ar from "./view/a";
-import Br from "./view/b";
+import GambleView from "./view/GambleView";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -31,7 +31,7 @@ function App() {
 
           <Routes>
             <Route path="/" element={<Ar />} />
-            <Route path="/a" element={<Br />} />
+            <Route path="/a" element={<GambleView />} />
           </Routes>
 
         </Box>
