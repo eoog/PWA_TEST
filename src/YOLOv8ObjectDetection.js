@@ -1,15 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import * as ort from 'onnxruntime-web';
 
-const YOLOv8ObjectDetection = () => {
+const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const [image, setImage] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const canvasRef = useRef(null);
+  const [alertShown, setAlertShown] = useState(false); // 경고 표시 여부 관리
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
+  useEffect(() => {
+    if (capturedFile) {
+      console.log("New captured file received: ", capturedFile);
+      handleFileChange(capturedFile);
+    }
+  }, [capturedFile]);
+
+  const handleFileChange = async (file) => {
     setImage(file);
-
     const detectedBoxes = await detectObjectsOnImage(file);
     setBoxes(detectedBoxes);
   };
@@ -18,24 +24,86 @@ const YOLOv8ObjectDetection = () => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
     img.onload = () => {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      ctx.strokeStyle = "#00FF00";
-      ctx.lineWidth = 3;
-      ctx.font = "18px serif";
+      console.log("안녕");
 
-      boxes.forEach(([x1, y1, x2, y2, label]) => {
-        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-        ctx.fillStyle = "#00ff00";
-        const width = ctx.measureText(label).width;
-        ctx.fillRect(x1, y1, width + 10, 25);
-        ctx.fillStyle = "#000000";
-        ctx.fillText(label, x1, y1 + 18);
-      });
+      // 1초 딜레이 후 이미지와 박스 그리기
+      setTimeout(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        ctx.strokeStyle = "#00FF00";
+        ctx.lineWidth = 3;
+        ctx.font = "18px serif";
+
+        let alertDisplayed = false; // 경고 메시지가 표시되었는지 추적하는 변수
+
+        // 특정 클래스에 해당하는 박스만 그리기
+        boxes.forEach(([x1, y1, x2, y2, label]) => {
+          if (shouldDrawBox(label)) { // 특정 클래스 필터링
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            ctx.fillStyle = "#00ff00";
+            const width = ctx.measureText(label).width;
+            ctx.fillRect(x1, y1, width + 10, 25);
+            ctx.fillStyle = "#000000";
+            ctx.fillText(label, x1, y1 + 18);
+
+            // 경고 메시지를 한 번만 띄우기
+            if (!alertDisplayed) {
+              alert("검출된 객체가 있습니다!"); // 경고 메시지
+              alertDisplayed = true; // 경고 메시지가 표시되었다고 설정
+              handleMessage();
+            }
+          }
+        });
+      }, 1000); // 1초 딜레이
     };
+  };
+
+  const handleMessage = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/src/service-worker.js')
+      .then(registration => {
+        console.log('서비스 워커 등록 성공:', registration);
+
+        // 서비스 워커가 준비되면 메시지 전송
+        registration.ready.then(function (registration) {
+          // 서비스 워커에 메시지 보내기
+          registration.active.postMessage({ type: 'START_BACKGROUND_SYNC' });
+        });
+      })
+      .catch(error => {
+        console.error('서비스 워커 등록 실패:', error);
+      });
+    }
+
+  }
+
+
+  const shouldDrawBox = (label) => {
+    const allowedClasses = [
+      '여성 생식기 가리기',
+      '여성 얼굴',
+      '둔부 노출',
+      '여성 유방 노출',
+      '여성 생식기 노출',
+      '남성 유방 노출',
+      '항문 노출',
+      '발 노출',
+      '배 가리기',
+      '발 가리기',
+      '겨드랑이 가리기',
+      '겨드랑이 노출',
+      '남성 얼굴',
+      '배 노출',
+      '남성 생식기 노출',
+      '항문 가리기',
+      '여성 유방 가리기',
+      '둔부 가리기'
+      // 필터링할 클래스 추가
+    ];
+    return allowedClasses.includes(label);
   };
 
   const detectObjectsOnImage = async (file) => {
@@ -152,9 +220,9 @@ const YOLOv8ObjectDetection = () => {
   ];
 
   return (
-      <div>
-        <input id="uploadInput" type="file" onChange={handleFileChange} />
-        <canvas ref={canvasRef}></canvas>
+      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/*<input id="uploadInput" type="file" onChange={(e) => handleFileChange(e.target.files[0])} />*/}
+        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'contain', marginTop: '10px' }} />
         {image && drawImageAndBoxes(image, boxes)}
       </div>
   );

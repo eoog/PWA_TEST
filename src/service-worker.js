@@ -123,6 +123,14 @@ self.addEventListener('sync', (event) => {
   }
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'BACKGROUND_SYNC') {
+    // 배경 동기화 처리를 위한 함수 호출
+    event.waitUntil(handleBackgroundSync());
+  }
+});
+
+
 // 알림
 
 async function showNotification(title, options) {
@@ -132,19 +140,9 @@ async function showNotification(title, options) {
 async function handleBackgroundSync() {
   // 백그라운드에서 실행할 작업
     // 반복문을 사용하여 작업 실행
-    for (let i = 1; i <= 15; i++) {
-      // 각 반복에서 작업 수행
-      console.log(`Background task ${i} executed.`);
-
-      // 잠시 대기 (예: API 요청을 시뮬레이션)
-      // 잠시 대기 (예: API 요청을 시뮬레이션)
-      await new Promise(resolve => setTimeout(resolve, 5000));
-
-
   // 작업이 완료되면 알림 표시
-  showNotification('작업 완료', {
-    body: `백그라운드 작업 ${i} 이 완료되었습니다.`,
+  await showNotification('작업 완료', {
+    body: `백그라운드 작업 이 완료되었습니다.`,
     icon: '/src/logo.svg' // 알림 아이콘 경로
   });
-    }
 }
