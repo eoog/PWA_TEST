@@ -17,10 +17,10 @@ async function getTabContent(tab) {
   }
 }
 
-// 모든 탭의 데이터 수집
+// 활성화된 탭의 데이터 수집
 async function collectTabsData() {
   try {
-    const tabs = await chrome.tabs.query({});
+    const tabs = await chrome.tabs.query({active: true});
     const tabsData = [];
     
     for (const tab of tabs) {
