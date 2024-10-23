@@ -56,15 +56,15 @@ function ScreenCapture({ setCapturedFile }) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const dataURL = canvas.toDataURL('image/png');
+      const dataURL = canvas.toDataURL('image/jpg');
       localStorage.setItem('canvasImage1', dataURL); // 로컬 스토리지에 저장
 
       // Blob 변환이 비동기적으로 처리되므로 await를 사용
       const blob = await new Promise((resolve) => {
-        canvas.toBlob(resolve, 'image/png');
+        canvas.toBlob(resolve, 'image/jpg');
       });
 
-      const file = new File([blob], 'screenshot.png', { type: 'image/png' });
+      const file = new File([blob], 'screenshot.png', { type: 'image/jpg' });
       setCapturedFile(file); // 캡처된 파일을 부모로 전달
     }
   };

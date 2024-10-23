@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 const Detection = () => {
   const [canvasImage, setCanvasImage] = useState(null);
@@ -32,16 +32,18 @@ const Detection = () => {
   }, []);
 
   return (
-      <div style={styles.container}>
-        <div style={styles.dateTime}>실시간 화면</div>
-        {canvasImage ? (
-            <>
-              <img src={canvasImage} alt="Canvas" style={styles.image} />
-              <p style={styles.dateTime}>{currentDateTime}</p> {/* 현재 날짜와 시간 표시 */}
-            </>
-        ) : (
-            <p>No image found</p>
-        )}
+      <div className="card-body flex-column">
+        <div style={styles.container}>
+          <div style={styles.dateTime}>일정 시간 실시간 캡쳐 화면 ( 3초 간격 )</div>
+          {canvasImage ? (
+              <>
+                <img src={canvasImage} alt="Canvas" style={styles.image}/>
+                <p style={styles.dateTime}>{currentDateTime}</p> {/* 현재 날짜와 시간 표시 */}
+              </>
+          ) : (
+              <p>No image found</p>
+          )}
+        </div>
       </div>
   );
 };

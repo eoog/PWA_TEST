@@ -1,0 +1,23 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button, input, a, div, span {
+  font-family: 'Noto Sans KR', 'Noto Sans', sans-serif !important;
+}
+img {
+  max-height: 100%;
+}
+body {
+  --header-size: 80px;
+  --sidebar-size: 280px;
+  --bg-card-color: #333;
+  --bg-main-color: #f9faf2;
+  --text-main-color: #2c2c2c;
+}
+
+

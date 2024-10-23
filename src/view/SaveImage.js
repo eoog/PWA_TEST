@@ -5,11 +5,22 @@ export default function SaveImage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0); // 현재 선택된 이미지 인덱스
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지 인덱스
   const [loading, setLoading] = useState(false); // 이미지 삭제 중 여부
+
   // 컴포넌트가 마운트될 때 IndexedDB에서 이미지 불러오기
   useEffect(() => {
-    loadImagesFromIndexedDB().then((loadedImages) => {
-      setImages(loadedImages); // 불러온 이미지 목록을 상태에 저장
-    });
+    const loadImages = () => {
+      loadImagesFromIndexedDB().then((loadedImages) => {
+        setImages(loadedImages); // 불러온 이미지 목록을 상태에 저장
+      });
+    };
+
+    loadImages(); // 처음 한 번 이미지를 불러옴
+
+    // 10초마다 이미지를 다시 불러옴
+    const intervalId = setInterval(loadImages, 5000);
+
+    // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(intervalId);
   }, []);
 
   // 다음 이미지로 이동
@@ -75,10 +86,12 @@ export default function SaveImage() {
     setImages([]); // 상태를 초기화하여 UI 업데이트
     setSelectedImageIndex(0);
     setCurrentPage(0);
+    setLoading(true); // 로딩 상태 설정
     clearDatabase().then(() => {
       setImages([]); // 상태를 초기화하여 UI 업데이트
       setSelectedImageIndex(0);
       setCurrentPage(0);
+      setLoading(false); // 로딩 상태 해제
     });
   };
 
@@ -154,7 +167,6 @@ export default function SaveImage() {
   );
 }
 
-
 // IndexedDB 열기 및 데이터베이스 설정
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -221,7 +233,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    width : '100%',
+    width: '100%',
     position: 'relative',
   },
   centerPanel: {
@@ -238,7 +250,7 @@ const styles = {
   thumbnailContainer: {
     display: 'flex',
     alignItems: 'center',
-    marginTop: '100px',
+    marginTop: '5px',
     overflow: 'hidden',
   },
   thumbnailWrapper: {

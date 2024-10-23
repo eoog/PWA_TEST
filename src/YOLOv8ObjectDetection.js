@@ -71,6 +71,8 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const drawImageAndBoxes = (file, boxes) => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
+    console.log("파일 ==" , file)
+    console.log("boex ==" , boxes)
 
     const onLoadHandler = () => {
       const canvas = canvasRef.current;
@@ -99,7 +101,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
       // 2초 이내 중복 호출 방지
       const currentTime = Date.now();
-      if (alertDisplayed && currentTime - lastAlertTime > 5000) {
+      if (alertDisplayed && currentTime - lastAlertTime > 6000) {
         handleMessage();
         saveImageToIndexedDB(canvas.toDataURL('image/png'))
         setLastAlertTime(currentTime); // 마지막 경고 시간을 업데이트
@@ -199,15 +201,25 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   };
 
   const processOutput = (output, imgWidth, imgHeight) => {
+    console.log("ddd" , output)
+    console.log("img_width" , imgWidth)
+    console.log("img_height" , imgHeight)
     let boxes = [];
     for (let index = 0; index < 2100; index++) {
       const [class_id, prob] = [...Array(80).keys()]
       .map(col => [col, output[2100 * (col + 4) + index]])
       .reduce((accum, item) => item[1] > accum[1] ? item : accum, [0, 0]);
-      if (prob < 0.5) {
+      if (prob < 0.3) {
         continue;
       }
-      const label = yoloClasses[class_id];
+
+      // 로그를 통해 prob 값을 확인
+      console.log(`Class ID: ${class_id}, Probability: ${prob}`);
+
+      console.log("클래스아이디 ==" + class_id)
+      console.log(yolo_classes[class_id])
+      const label = yolo_classes[class_id];
+      console.log("??" , label)
       const xc = output[index];
       const yc = output[2100 + index];
       const w = output[2 * 2100 + index];
@@ -225,6 +237,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       result.push(boxes[0]);
       boxes = boxes.filter(box => iou(boxes[0], box) < 0.7);
     }
+    console.log("리졀트 " , result)
     return result;
   };
 
@@ -250,7 +263,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     return (x2 - x1) * (y2 - y1);
   };
 
-  const yoloClasses = [
+  const yolo_classes = [
     '여성 생식기 가리기',
     '여성 얼굴',
     '둔부 노출',

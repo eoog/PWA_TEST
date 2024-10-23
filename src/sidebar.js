@@ -17,13 +17,13 @@ export default function Example() {
   // 링크에 따라 배경 색상을 결정하는 함수
   const getMenuItemStyle = (path) => {
     return location.pathname === path
-        ? { backgroundColor: "darkgray", opacity: 0.4, color: "black" }
-        : { backgroundColor: "white", opacity: 0.4, color: "black" };
+        ? { backgroundColor: "darkgray", opacity: 0.4, color: "black" , textDecoration: "none"}
+        : { backgroundColor: "white", opacity: 0.4, color: "black" , textDecoration: "none" };
   };
 
   return (
       <Box sx={{ boxShadow: 1, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB" }}>
-        <Sidebar backgroundColor="#FBFBFB">
+        <Sidebar>
           <Menu>
             <MenuItem
                 icon={<MenuOutlinedIcon />}
@@ -73,7 +73,7 @@ export default function Example() {
             )}
             <Link to="/dection">
               <MenuItem style={getMenuItemStyle("/dection")} icon={<HomeOutlinedIcon />}>
-                선정성-일정간격 캡쳐
+                <p style={{textDecoration:"none"}}>선정성-일정간격 캡쳐</p>
               </MenuItem>
             </Link>
             <Link to="/dection_save_image">
