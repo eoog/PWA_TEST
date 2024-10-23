@@ -6,6 +6,7 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Detection from "./view/Detection";
 import GambleView from "./view/GambleView";
 import SaveImage from "./view/SaveImage";
+import Test from "./view/Test";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
