@@ -24,3 +24,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }, "*");
   }
 });
+
+// DOM 변화 감지
+const observer = new MutationObserver(() => {
+  // 탭의 변화된 내용을 감지하고 background script에 요청
+  console.log("변화 감지!");
+  chrome.runtime.sendMessage({ type: "REQUEST_TABS_DATA" });
+});
+
+// body 태그의 변화를 감지
+observer.observe(document.body, { childList: true, subtree: true, characterData: true });
