@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
-import { Box } from '@mui/material';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Ar from "./view/a";
+import {Box} from '@mui/material';
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import Detection from "./view/Detection";
 import GambleView from "./view/GambleView";
+import SaveImage from "./view/SaveImage";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -26,12 +27,16 @@ function App() {
 
   return (
       <Router>
-        <Box sx={{ display: 'flex', height: '100vh' }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
-          <Example />  {/* 사이드바 컴포넌트 */}
+        <Box sx={{
+          display: 'flex',
+          height: '100vh'
+        }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
+          <Example/> {/* 사이드바 컴포넌트 */}
 
           <Routes>
-            <Route path="/" element={<Ar />} />
-            <Route path="/a" element={<GambleView />} />
+            <Route path="/dection" element={<Detection/>}/>
+            <Route path="/dection_save_image" element={<SaveImage />}/>
+            <Route path="/a" element={<GambleView/>}/>
           </Routes>
 
         </Box>

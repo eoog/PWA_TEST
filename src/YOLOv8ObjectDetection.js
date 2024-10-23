@@ -9,6 +9,11 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const [num , setNum] = useState(0);
 
   useEffect(() => {
+    // 컴포넌트가 마운트될 때 IndexedDB를 초기화
+    openDatabase();
+  }, []); // 빈 배열로 한 번만 실행
+
+  useEffect(() => {
     if (capturedFile) {
       handleFileChange(capturedFile);
     }
@@ -19,6 +24,47 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     const detectedBoxes = await detectObjectsOnImage(file);
     setBoxes(detectedBoxes);
   };
+
+  // IndexedDB 열기 및 데이터베이스 설정
+  function openDatabase() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("CanvasDB", 1);
+
+      request.onerror = (event) => {
+        console.error("IndexedDB error:", event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+
+      request.onsuccess = (event) => {
+        console.log("IndexedDB opened successfully");
+        resolve(event.target.result);
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+      };
+    });
+  }
+
+  function saveImageToIndexedDB(dataURL) {
+    openDatabase().then((db) => {
+      const transaction = db.transaction("images", "readwrite");
+      const store = transaction.objectStore("images");
+      const image = {data: dataURL};
+
+      const request = store.add(image);
+
+      request.onsuccess = () => {
+        console.log("Image saved to IndexedDB successfully.");
+      };
+
+      request.onerror = (event) => {
+        console.error("Error saving image to IndexedDB:",
+            event.target.errorCode);
+      };
+    });
+  }
 
   const [lastAlertTime, setLastAlertTime] = useState(0); // 마지막 경고 시간 저장
 
@@ -55,6 +101,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       const currentTime = Date.now();
       if (alertDisplayed && currentTime - lastAlertTime > 5000) {
         handleMessage();
+        saveImageToIndexedDB(canvas.toDataURL('image/png'))
         setLastAlertTime(currentTime); // 마지막 경고 시간을 업데이트
       }
 

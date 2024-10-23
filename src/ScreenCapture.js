@@ -4,6 +4,17 @@ function ScreenCapture({ setCapturedFile }) {
   const videoRef = useRef(null);
   const [isSharing, setIsSharing] = useState(false);
   const [captureInterval, setCaptureInterval] = useState(3000); // 캡처 간격을 설정
+  const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+
+  // 데이터 요청 함수
+  const requestShareAndContent = () => {
+    console.log("Requesting URL content...");
+    window.postMessage({
+      type: "SHARE",
+      source: "SHARE",
+      identifier: EXTENSION_IDENTIFIER
+    }, "*");
+  };
 
   useEffect(() => {
     startScreenShare();
@@ -19,6 +30,7 @@ function ScreenCapture({ setCapturedFile }) {
         videoRef.current.srcObject = stream;
       }
       setIsSharing(true);
+      requestShareAndContent();
 
       // 캡처 간격에 맞춰 캡처 호출
       const intervalId = setInterval(() => {
