@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Ar from "./view/a";
 import GambleView from "./view/GambleView";
+import Test from "./view/Test";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -32,6 +33,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Ar />} />
             <Route path="/a" element={<GambleView />} />
+            <Route path="/test" element={<Test />} />
           </Routes>
 
         </Box>

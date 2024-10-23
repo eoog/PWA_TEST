@@ -8,7 +8,7 @@ const GambleView = () => {
 
     // 데이터 요청 함수
     const requestUrlsAndContent = () => {
-        console.log("Requesting URL content...");
+        console.log("URL과 콘텐츠를 요청합니다...");
         window.postMessage({
             type: "REQUEST_URLS_AND_CONTENT",
             source: "PWA",
