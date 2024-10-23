@@ -55,3 +55,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 
+// 화면 공유하기 완료시 브라우저창 최소화.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "minimize_window") {
+    // 현재 창 가져오기
+    chrome.windows.getCurrent((window) => {
+      // 창 최소화
+      chrome.windows.update(window.id, { state: 'minimized' });
+    });
+
+    console.log("브라우저 창이 최소화되었습니다.");
+  }
+});
+

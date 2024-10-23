@@ -5,21 +5,24 @@ import {
   Menu,
   MenuItem,
   useProSidebar,
-  SubMenu,
 } from "react-pro-sidebar";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ArticleIcon from "@mui/icons-material/Article";
-import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import {Link} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Example() {
   const { collapseSidebar, collapsed } = useProSidebar();
+  const location = useLocation(); // 현재 경로를 가져오기
+
+  // 링크에 따라 배경 색상을 결정하는 함수
+  const getMenuItemStyle = (path) => {
+    return location.pathname === path
+        ? { backgroundColor: "darkgray", opacity: 0.4, color: "black" }
+        : { backgroundColor: "white", opacity: 0.4, color: "black" };
+  };
 
   return (
-      <Box sx={{ boxShadow: 1, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB"}}>
+      <Box sx={{ boxShadow: 1, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB" }}>
         <Sidebar backgroundColor="#FBFBFB">
           <Menu>
             <MenuItem
@@ -68,24 +71,24 @@ export default function Example() {
                   </Box>
                 </Fade>
             )}
-            <Link to="/">
-            <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>
+            <Link to="/dection">
+              <MenuItem style={getMenuItemStyle("/dection")} icon={<HomeOutlinedIcon />}>
+                선정성-일정간격 캡쳐
+              </MenuItem>
+            </Link>
+            <Link to="/dection_save_image">
+              <MenuItem style={getMenuItemStyle("/dection_save_image")} icon={<HomeOutlinedIcon />}>
+                선정성 - 검출 이미지
+              </MenuItem>
             </Link>
             <Link to="/a">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>룰루랄라</MenuItem>
+              <MenuItem style={getMenuItemStyle("/a")} icon={<HomeOutlinedIcon />}>
+                룰루랄라
+              </MenuItem>
             </Link>
             <Link to="/test">
               <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>테스트</MenuItem>
             </Link>
-            {/*<Link to="/a">*/}
-            {/*  <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>*/}
-            {/*</Link>*/}
-            {/*<SubMenu icon={<FolderSharedIcon />} label="Projects">*/}
-            {/*  <MenuItem icon={<ArticleIcon />}> Project 1</MenuItem>*/}
-            {/*  <MenuItem icon={<ArticleIcon />}> Project-Project-Project</MenuItem>*/}
-            {/*  <MenuItem icon={<AddCircleOutlineIcon />}>Add Project</MenuItem>*/}
-            {/*</SubMenu>*/}
-            {/*<MenuItem icon={<PersonOutlineIcon />}>My Page</MenuItem>*/}
           </Menu>
         </Sidebar>
       </Box>

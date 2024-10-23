@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const Ar = () => {
+const Detection = () => {
   const [canvasImage, setCanvasImage] = useState(null);
   const [currentDateTime, setCurrentDateTime] = useState("");
 
@@ -66,4 +66,4 @@ const styles = {
   },
 };
 
-export default Ar;
+export default Detection;
