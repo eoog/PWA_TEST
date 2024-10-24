@@ -99,6 +99,9 @@ export default function Example() {
             <Link to="/test2">
               <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트2</MenuItem>
             </Link>
+            <Link to="/test3">
+              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트3</MenuItem>
+            </Link>
           </Menu>
         </Sidebar>
       </Box>

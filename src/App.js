@@ -9,6 +9,7 @@ import SaveImage from "./view/SaveImage";
 import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
+import Test3 from "./view/Test3";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -43,6 +44,7 @@ function App() {
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
             <Route path="/test2" element={<Test2/>}/>
+            <Route path="/test3" element={<Test3/>}/>
           </Routes>
 
         </Box>
