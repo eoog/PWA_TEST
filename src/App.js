@@ -8,6 +8,7 @@ import GambleView from "./view/GambleView";
 import SaveImage from "./view/SaveImage";
 import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
+import Test2 from "./view/Test2";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -41,6 +42,7 @@ function App() {
             <Route path="/dection_save_image" element={<SaveImage/>}/>
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
+            <Route path="/test2" element={<Test2/>}/>
           </Routes>
 
         </Box>
