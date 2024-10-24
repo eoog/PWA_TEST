@@ -71,8 +71,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const drawImageAndBoxes = (file, boxes) => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
-    console.log("파일 ==" , file)
-    console.log("boex ==" , boxes)
 
     const onLoadHandler = () => {
       const canvas = canvasRef.current;
@@ -83,6 +81,9 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       ctx.strokeStyle = "#00FF00";
       ctx.lineWidth = 3;
       ctx.font = "18px serif";
+
+      const dataURL = canvas.toDataURL('image/png');
+      localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
 
       let alertDisplayed = false;
 
@@ -107,8 +108,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
         setLastAlertTime(currentTime); // 마지막 경고 시간을 업데이트
       }
 
-      const dataURL = canvas.toDataURL('image/png');
-      localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
 
       img.onload = null; // onload 이벤트 리스너 제거
     };
@@ -201,9 +200,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   };
 
   const processOutput = (output, imgWidth, imgHeight) => {
-    console.log("ddd" , output)
-    console.log("img_width" , imgWidth)
-    console.log("img_height" , imgHeight)
     let boxes = [];
     for (let index = 0; index < 2100; index++) {
       const [class_id, prob] = [...Array(80).keys()]
@@ -214,12 +210,8 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       }
 
       // 로그를 통해 prob 값을 확인
-      console.log(`Class ID: ${class_id}, Probability: ${prob}`);
 
-      console.log("클래스아이디 ==" + class_id)
-      console.log(yolo_classes[class_id])
       const label = yolo_classes[class_id];
-      console.log("??" , label)
       const xc = output[index];
       const yc = output[2100 + index];
       const w = output[2 * 2100 + index];
@@ -237,7 +229,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       result.push(boxes[0]);
       boxes = boxes.filter(box => iou(boxes[0], box) < 0.7);
     }
-    console.log("리졀트 " , result)
     return result;
   };
 

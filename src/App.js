@@ -37,7 +37,7 @@ function App() {
 
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/dection" element={<Detection/>}/>
+            {/*<Route path="/dection" element={<Detection/>}/>*/}
             <Route path="/dection_save_image" element={<SaveImage/>}/>
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
