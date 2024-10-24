@@ -1,5 +1,6 @@
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
+// 탭에서 컨텐츠 추출하는 함수
 async function getTabContent(tab) {
     try {
         const results = await chrome.scripting.executeScript({
@@ -13,6 +14,7 @@ async function getTabContent(tab) {
     }
 }
 
+// 활성화된 탭의 데이터 수집하는 함수
 async function collectTabsData() {
     try {
         const tabs = await chrome.tabs.query({active: true});
@@ -34,7 +36,7 @@ async function collectTabsData() {
     }
 }
 
-// 탭 변경 감지
+// 탭의 변경을 감지하고 데이터 전송
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.active) {
         collectTabsData().then(tabsData => {
@@ -49,6 +51,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // content script로부터의 메시지 수신
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    // 탭의 데이터 요청
     if (request.type === "REQUEST_TABS_DATA") {
         collectTabsData().then(tabsData => {
             chrome.tabs.sendMessage(sender.tab.id, {
@@ -58,7 +61,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
         });
     }
-
+    // 화면 공유하기 연결시 브라우저 최소화
     if (request.action === "minimize_window") {
         chrome.windows.getCurrent((window) => {
             chrome.windows.update(window.id, { state: 'minimized' });
