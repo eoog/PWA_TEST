@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import ScreenShareContext from "./ScreenShareProvider";
 
 function ScreenCapture({ setCapturedFile }) {
-  const videoRef = useRef(null);
   const [isSharing, setIsSharing] = useState(false);
   const [captureInterval, setCaptureInterval] = useState(3000); // 캡처 간격을 설정
   const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+
+  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
 
   // 데이터 요청 함수
   const requestShareAndContent = () => {
@@ -17,18 +19,17 @@ function ScreenCapture({ setCapturedFile }) {
   };
 
   useEffect(() => {
-    startScreenShare();
-  }, []);
+    if (!stream) {
+      startScreenShare();
+    } else if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      StartStream();
+    }
+  }, [stream, startScreenShare]);
 
-  const startScreenShare = async () => {
+  const StartStream = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: false
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
+
       setIsSharing(true);
       requestShareAndContent();
 

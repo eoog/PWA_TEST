@@ -7,6 +7,7 @@ import Detection from "./view/Detection";
 import GambleView from "./view/GambleView";
 import SaveImage from "./view/SaveImage";
 import Test from "./view/Test";
+import Dashboard from "./view/Dashboard";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -35,6 +36,7 @@ function App() {
           <Example/> {/* 사이드바 컴포넌트 */}
 
           <Routes>
+            <Route path="/" element={<Dashboard />} />
             <Route path="/dection" element={<Detection/>}/>
             <Route path="/dection_save_image" element={<SaveImage/>}/>
             <Route path="/a" element={<GambleView/>}/>

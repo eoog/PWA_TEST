@@ -48,16 +48,18 @@ export default function Example() {
                           width: 85,
                           height: 85,
                           borderRadius: 85,
-                          bgcolor: "#000000",
+                          bgcolor: "#fffff",
                         }}
-                    ></Box>
+                    >
+                      <img src={require('./meer.ico')} />
+                    </Box>
                     <Box
                         sx={{
                           color: "black",
                           mt: 2,
                         }}
                     >
-                      Knowwhersoft
+                      Knowwheresoft
                     </Box>
                     <Box
                         sx={{
@@ -66,11 +68,16 @@ export default function Example() {
                           fontSize: 12,
                         }}
                     >
-                      knowwhersoft
+                      knowwheresoft
                     </Box>
                   </Box>
                 </Fade>
             )}
+            <Link to="/">
+              <MenuItem style={getMenuItemStyle("/")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>선정성-대시보드</p>
+              </MenuItem>
+            </Link>
             <Link to="/dection">
               <MenuItem style={getMenuItemStyle("/dection")} icon={<HomeOutlinedIcon />}>
                 <p style={{textDecoration:"none"}}>선정성-일정간격 캡쳐</p>

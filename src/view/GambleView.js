@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import YOLOv8ObjectDetection from "../YOLOv8ObjectDetection";
 
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
