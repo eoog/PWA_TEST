@@ -78,14 +78,9 @@ export default function Example() {
                 <p style={{textDecoration:"none"}}>선정성-대시보드</p>
               </MenuItem>
             </Link>
-            {/*<Link to="/dection">*/}
-            {/*  <MenuItem style={getMenuItemStyle("/dection")} icon={<HomeOutlinedIcon />}>*/}
-            {/*    <p style={{textDecoration:"none"}}>선정성-일정간격 캡쳐</p>*/}
-            {/*  </MenuItem>*/}
-            {/*</Link>*/}
-            <Link to="/dection_save_image">
-              <MenuItem style={getMenuItemStyle("/dection_save_image")} icon={<HomeOutlinedIcon />}>
-                선정성 - 검출 이미지
+            <Link to="/board">
+              <MenuItem style={getMenuItemStyle("/board")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
               </MenuItem>
             </Link>
             <Link to="/a">

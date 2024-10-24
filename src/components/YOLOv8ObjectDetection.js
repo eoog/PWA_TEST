@@ -11,9 +11,11 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   useEffect(() => {
     // 컴포넌트가 마운트될 때 IndexedDB를 초기화
     openDatabase();
+    openDatabaseScreen()
   }, []); // 빈 배열로 한 번만 실행
 
   useEffect(() => {
+    console.log("캡쳐 ==" , capturedFile)
     if (capturedFile) {
       handleFileChange(capturedFile);
     }
@@ -24,6 +26,60 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     const detectedBoxes = await detectObjectsOnImage(file);
     setBoxes(detectedBoxes);
   };
+
+  // 스크린샷 캡쳐 이미지만 저장 > 검출 이미지 아님
+  function openDatabaseScreen() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("canvasImage", 1);
+
+      request.onerror = (event) => {
+        console.error("IndexedDB error:", event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+
+      request.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+      };
+    });
+  }
+
+  function saveScreenToIndexedDB(imageData) {
+    return new Promise((resolve, reject) => {
+      openDatabaseScreen().then((db) => {
+        const transaction = db.transaction("images", "readwrite");
+        const store = transaction.objectStore("images");
+
+        // 모든 데이터를 삭제
+        const deleteRequest = store.clear();
+
+        deleteRequest.onsuccess = () => {
+          // 모든 데이터 삭제가 완료된 후 새 이미지 추가
+          const imageObject = { data: imageData }; // 이미지 데이터 객체 생성
+          const addRequest = store.add(imageObject); // 이미지 추가
+
+          addRequest.onsuccess = () => {
+            resolve("Image saved successfully.");
+          };
+
+          addRequest.onerror = (event) => {
+            console.error("Error saving image:", event.target.errorCode);
+            reject(event.target.errorCode);
+          };
+        };
+
+        deleteRequest.onerror = (event) => {
+          console.error("Error clearing images:", event.target.errorCode);
+          reject(event.target.errorCode);
+        };
+      });
+    });
+  }
+
 
   // IndexedDB 열기 및 데이터베이스 설정
   function openDatabase() {
@@ -83,7 +139,8 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
       ctx.font = "18px serif";
 
       const dataURL = canvas.toDataURL('image/png');
-      localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
+      saveScreenToIndexedDB(dataURL);
+      //localStorage.setItem('canvasImage', dataURL); // 로컬 스토리지에 저장
 
       let alertDisplayed = false;
 

@@ -3,12 +3,13 @@ import './App.css';
 import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
 import {Box} from '@mui/material';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import Detection from "./view/Detection";
+import Detection from "./view/Detection_disable";
 import GambleView from "./view/GambleView";
-import SaveImage from "./view/SaveImage";
+import SaveImage from "./view/SaveImage_disable";
 import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
+import ImageBoard from "./view/ImageList";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -29,6 +30,7 @@ function App() {
   }, []);
 
   return (
+      <>
       <Router>
         <Box sx={{
           display: 'flex',
@@ -38,8 +40,7 @@ function App() {
 
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            {/*<Route path="/dection" element={<Detection/>}/>*/}
-            <Route path="/dection_save_image" element={<SaveImage/>}/>
+            <Route path="/board" element={<ImageBoard />} />
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
             <Route path="/test2" element={<Test2/>}/>
@@ -47,6 +48,8 @@ function App() {
 
         </Box>
       </Router>
+
+      </>
   );
 }
 

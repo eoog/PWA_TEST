@@ -20,12 +20,17 @@ const Dashboard = () => {
   const [currentDateTime, setCurrentDateTime] = useState("");
 
   useEffect(() => {
-    const getImageFromLocalStorage = () => {
-      const image = localStorage.getItem('canvasImage');
-      if (image) {
-        setCanvasImage(image);
-      }
+    const loadImages = () => {
+      loadScreenFromIndexedDB().then((loadedImages) => {
+        setCanvasImage(loadedImages); // 불러온 이미지 목록을 상태에 저장
+      });
     };
+    // const getImageFromLocalStorage = () => {
+    //   const image = localStorage.getItem('canvasImage');
+    //   if (image) {
+    //     setCanvasImage(image);
+    //   }
+    // };
 
     // 현재 날짜와 시간을 설정하는 함수
     const updateCurrentDateTime = () => {
@@ -35,8 +40,8 @@ const Dashboard = () => {
       setCurrentDateTime(`${date} ${time}`); // 날짜와 시간 결합
     };
 
-    getImageFromLocalStorage();
-    const intervalId = setInterval(getImageFromLocalStorage, 1000);
+    loadImages();
+    const intervalId = setInterval(loadImages, 3000);
     updateCurrentDateTime(); // 컴포넌트가 마운트될 때 날짜와 시간을 초기화
     const dateTimeIntervalId = setInterval(updateCurrentDateTime, 1000); // 매 초마다 날짜와 시간 업데이트
 
@@ -45,6 +50,50 @@ const Dashboard = () => {
       clearInterval(dateTimeIntervalId); // 클린업: 날짜와 시간 업데이트 인터벌 제거
     };
   }, []);
+
+  // 스크린샷 캡쳐 이미지만 저장 > 검출 이미지 아님
+  function openDatabaseScreen() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("canvasImage", 1);
+
+      request.onerror = (event) => {
+        console.error("IndexedDB error:", event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+
+      request.onsuccess = (event) => {
+        resolve(event.target.result);
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+      };
+    });
+  }
+
+  function loadScreenFromIndexedDB() {
+    return new Promise((resolve, reject) => {
+      openDatabaseScreen().then((db) => {
+        const transaction = db.transaction("images", "readonly");
+        const store = transaction.objectStore("images");
+        const request = store.getAll(); // 모든 이미지 가져오기
+
+        request.onsuccess = (event) => {
+          try {
+          resolve(event.target.result[0].data); // 모든 이미지를 배열로 반환
+          } catch (e) {
+            resolve(null)
+          }
+        };
+
+        request.onerror = (event) => {
+          console.error("Error loading images from IndexedDB:", event.target.errorCode);
+          reject(event.target.errorCode);
+        };
+      });
+    });
+  }
 
 
   const [images, setImages] = useState([]); // IndexedDB에서 불러온 이미지 목록
@@ -71,11 +120,14 @@ const Dashboard = () => {
   function loadImagesFromIndexedDB() {
     return new Promise((resolve, reject) => {
       openDatabase().then((db) => {
-        const transaction = db.transaction("images", "readonly");
+        const transaction = db.transaction("images", "readwrite");
         const store = transaction.objectStore("images");
         const request = store.getAll(); // 모든 이미지 불러오기
 
         request.onsuccess = (event) => {
+          if (event.target.result.length > 1000) {
+            store.clear();
+          }
           resolve(event.target.result); // 모든 이미지를 배열로 반환
         };
 
@@ -138,24 +190,21 @@ const Dashboard = () => {
       <>
         <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col">
           {/* Top three cards */}
-          <div className="grid grid-cols-3 gap-6" style={{flex: '0 0 40%'}}>
+          <div className="grid grid-cols-3 gap-6" style={{flex: '0 0 45%'}}>
             <Card className="h-full">
               <CardHeader className="text-neutral-500 text-2xl">실시간 화면 공유 현황</CardHeader>
-              <CardContent onClick={handleOpenModal} style={{ cursor: 'pointer' }}>
-                <div style={{ width: '100%', height: '100%' }}>
+              <CardContent className="h-full items-center justify-center flex" onClick={handleOpenModal} style={{ cursor: 'pointer' }}>
+                <div className="h-full items-center justify-center flex" style={{ width: '100%', height: '380px' }}>
                   {stream ? (
+                      <div>
                       <video
                           ref={videoRef}
                           autoPlay
                           playsInline
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain',
-                          }}
                       />
+                      </div>
                   ) : (
-                      <div className="mt-16">
+                      <div className="">
                         <img className="flex justify-center m-auto" src={require('../meer.ico')} />
                         <p className="flex justify-center text-neutral-500 text-xl">화면 공유를 시작 해주세요.</p>
                       </div>
@@ -164,41 +213,50 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             <Card className="h-full">
-              <CardHeader className="text-neutral-500 text-2xl">3초간 화면 캡쳐
-                현황</CardHeader>
-              <CardContent onClick={handleOpenImageModal} style={{ cursor: 'pointer' }}>
-              {canvasImage ? (
+              <CardHeader className="text-neutral-500 text-2xl">3초간 화면 캡쳐 현황</CardHeader>
+              <CardContent className="h-full items-center justify-center flex" onClick={handleOpenImageModal} style={{ cursor: 'pointer' }}>
+              <div className="items-center flex justify-center">
+                {canvasImage ? (
                     <>
-                      <img src={canvasImage} alt="Canvas"/>
-                      <p className="flex justify-center mt-2 text-xl">{currentDateTime}</p> {/* 현재 날짜와 시간 표시 */}
+                      <div>
+                      <img src={canvasImage} alt="Canvas" />
+                      {/*<p className="flex justify-center items-center mt-2 text-xl">{currentDateTime}</p> /!* 현재 날짜와 시간 표시 *!/*/}
+                      </div>
                     </>
                 ) : (
-                    <div className="mt-16">
+                    <div className="">
                       <img className="flex justify-center m-auto"
-                           src={require('../meer.ico')}/>
+                           src={require('../meer.ico')} alt={""}/>
                       <p className="flex justify-center text-neutral-500 text-xl">저장된 이미지가 없습니다.</p>
                     </div>
                 )}
+              </div>
               </CardContent>
             </Card>
             <Card className="h-full">
               <CardHeader className="text-neutral-500 text-2xl">실시간 선정성 검출
                 현황</CardHeader>
-              <CardContent onClick={handleOpenDetectionModal} style={{ cursor: 'pointer' }}>
-                {images.length > 0 ? (
-                    <div >
-                      <img
-                          src={images[images.length - 1]?.data}
-                          alt="Selected"
+              <CardContent className="h-full items-center justify-center flex"
+                           onClick={handleOpenDetectionModal}
+                           style={{cursor: 'pointer'}}>
+                <div className="">
+                  {images.length > 0 ? (
+                      <div className="">
+                        <img
+                            src={images[images.length - 1]?.data}
+                            alt="Selected"
 
-                      />
-                    </div>
-                ) : (
-                    <div className="mt-16">
-                      <img className="flex justify-center m-auto" src={require('../meer.ico')} />
-                      <p className="flex justify-center text-neutral-500 text-xl">검출된 이미지가 없습니다.</p>
-                    </div>
-                )}
+                        />
+                      </div>
+                  ) : (
+                      <div className="">
+                        <img className="flex justify-center m-auto"
+                             src={require('../meer.ico')}/>
+                        <p className="flex justify-center text-neutral-500 text-xl">검출된
+                          이미지가 없습니다.</p>
+                      </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
