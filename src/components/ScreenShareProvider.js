@@ -14,7 +14,6 @@ export const ScreenShareProvider = ({ children }) => {
         audio: false,
       });
       setStream(stream);
-      videoRef.current.srcObject = stream;
     } catch (err) {
       console.error('Error starting screen capture: ', err);
     }

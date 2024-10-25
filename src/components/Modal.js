@@ -13,12 +13,12 @@ const Modal = forwardRef(({ isOpen, onClose }, ref) => {
 
   return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white rounded-lg shadow-lg p-4 relative">
+        <div className="bg-white rounded-lg shadow-lg p-8 relative">
           <button
               className="absolute top-2 right-2 text-red-500"
               onClick={onClose}
           >
-            X
+            <img src={require("../close.png")} width={50} height={20}/>
           </button>
           <video
               ref={videoRef} // 비디오 스트림을 모달에 전달

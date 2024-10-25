@@ -28,7 +28,9 @@ function ScreenCapture({ setCapturedFile }) {
 
   const StartStream = async () => {
     try {
-      requestShareAndContent();
+      
+      // 임시로 주석 추후에 다시 주석 해제후 실행
+      //requestShareAndContent();
       setIsSharing(true);
 
       // 캡처 간격에 맞춰 캡처 호출
@@ -55,8 +57,8 @@ function ScreenCapture({ setCapturedFile }) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const dataURL = canvas.toDataURL('image/jpg');
-      localStorage.setItem('canvasImage1', dataURL); // 로컬 스토리지에 저장
+      // const dataURL = canvas.toDataURL('image/jpg');
+      // localStorage.setItem('canvasImage1', dataURL); // 로컬 스토리지에 저장
 
       // Blob 변환이 비동기적으로 처리되므로 await를 사용
       const blob = await new Promise((resolve) => {

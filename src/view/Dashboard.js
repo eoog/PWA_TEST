@@ -16,6 +16,48 @@ const Dashboard = () => {
   const [canvasImage, setCanvasImage] = useState(null);
   const [currentDateTime, setCurrentDateTime] = useState("");
 
+  const renderEmptyState = () => (
+      <div className="flex flex-col">
+        <img
+            className="flex flex-col items-center justify-center m-auto w-24 h-24 mb-4"
+            src={require('../meer.ico')}
+            alt=""
+        />
+        <p className="text-xl font-semibold text-center text-neutral-500">저장된 이미지가 없습니다.</p>
+      </div>
+  );
+
+
+  const renderVideoContent = () => {
+    if (!stream) {
+      return (
+          <div className="flex flex-col items-center justify-center h-[50vh] text-neutral-500">
+            <img
+                className="w-24 h-24 mb-4"
+                src={require('../meer.ico')}
+                alt="Placeholder icon"
+            />
+            <p className="text-xl font-semibold">화면 공유가 시작되지 않았습니다</p>
+            <p className="mt-2" onClick={() => window.location.reload()}>화면 공유를 시작하려면 클릭하세요</p>
+          </div>
+      );
+    }
+
+    return (
+        <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            onClick={handleOpenModal}
+            style={{
+              width: '100%',
+              height: 'auto',
+              maxHeight: '90vh'
+            }}
+        />
+    );
+  };
+
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
@@ -29,6 +71,7 @@ const Dashboard = () => {
       });
     };
 
+
     // 현재 날짜와 시간을 설정하는 함수
     const updateCurrentDateTime = () => {
       const now = new Date();
@@ -39,6 +82,7 @@ const Dashboard = () => {
 
     loadImages();
     const intervalId = setInterval(loadImages, 3000);
+    // 10초마다 이미지를 다시 불러옴
     updateCurrentDateTime(); // 컴포넌트가 마운트될 때 날짜와 시간을 초기화
     const dateTimeIntervalId = setInterval(updateCurrentDateTime, 1000); // 매 초마다 날짜와 시간 업데이트
 
@@ -96,7 +140,7 @@ const Dashboard = () => {
   const [images, setImages] = useState([]); // IndexedDB에서 불러온 이미지 목록
   const [selectedImageIndex, setSelectedImageIndex] = useState(0); // 현재 선택된 이미지 인덱스
 
-  // 컴포넌트가 마운트될 때 IndexedDB에서 이미지 불러오기
+  // // 컴포넌트가 마운트될 때 IndexedDB에서 이미지 불러오기
   useEffect(() => {
     const loadImages = () => {
       loadImagesFromIndexedDB().then((loadedImages) => {
@@ -107,7 +151,7 @@ const Dashboard = () => {
     loadImages(); // 처음 한 번 이미지를 불러옴
 
     // 10초마다 이미지를 다시 불러옴
-    const intervalId = setInterval(loadImages, 5000);
+    const intervalId = setInterval(loadImages, 3000);
 
     // 컴포넌트 언마운트 시 인터벌 정리
     return () => clearInterval(intervalId);
@@ -185,18 +229,17 @@ const Dashboard = () => {
 
   return (
       <>
-        <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col">
-          {/* Top three cards */}
+        <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-6">
             <Card className="h-full">
-              <CardContent className="h-full items-center justify-center"
-                           onClick={handleOpenImageModal}
-                           style={{cursor: 'pointer'}}>
+              <CardContent
+                  className="h-full items-center justify-center"
+                  onClick={handleOpenImageModal}
+                  style={{cursor: 'pointer'}}
+              >
                 <CardHeader className="text-neutral-500 font-bold text-2xl">
                   <div className="flex gap-6 items-center justify-center">
-                    <div>
-                      3초간 화면 캡쳐 현황
-                    </div>
+                    <div>3초간 화면 캡쳐 현황</div>
                   </div>
                 </CardHeader>
                 <div className="items-center flex justify-center">
@@ -204,21 +247,16 @@ const Dashboard = () => {
                       <div>
                         <img src={canvasImage} alt="Canvas"/>
                       </div>
-                  ) : (
-                      <div className="">
-                        <img className="flex justify-center m-auto"
-                             src={require('../meer.ico')} alt=""/>
-                        <p className="flex justify-center text-neutral-500 text-xl">저장된
-                          이미지가 없습니다.</p>
-                      </div>
-                  )}
+                  ) : renderEmptyState()}
                 </div>
               </CardContent>
             </Card>
             <Card className="h-full">
-              <CardContent className="h-full items-center justify-center"
-                           onClick={handleOpenDetectionModal}
-                           style={{cursor: 'pointer'}}>
+              <CardContent
+                  className="h-full items-center justify-center"
+                  onClick={handleOpenDetectionModal}
+                  style={{cursor: 'pointer'}}
+              >
                 <CardHeader className="text-neutral-500 font-bold text-2xl">
                   <div className="flex gap-6 items-center justify-center">
                     <div>실시간 선정성 검출 현황</div>
@@ -230,49 +268,44 @@ const Dashboard = () => {
                         <img src={images[images.length - 1]?.data}
                              alt="Selected"/>
                       </div>
-                  ) : (
-                      <div className="">
-                        <img className="flex justify-center m-auto"
-                             src={require('../meer.ico')} alt=""/>
-                        <p className="flex justify-center text-neutral-500 text-xl">검출된
-                          이미지가 없습니다.</p>
-                      </div>
-                  )}
+                  ) : renderEmptyState()}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Large card below */}
-          <Card className="w-full mt-6 h-full"
-                style={{
-                  maxHeight: '90vh',
-                  maxWidth: '90vw',
-                  overflow: 'hidden',
-                  margin: 'auto'
-                }}>
-            <CardHeader>Large Card</CardHeader>
-            <CardContent>
-              <video ref={videoRef} autoPlay playsInline
-                     onClick={handleOpenModal}
-                     style={{
-                       width: '100%',
-                       height: 'auto',
-                       maxHeight: '90vh'
-                     }}/>
-              {/* 영상 높이를 90vh로 제한 */}
+          <Card
+              className="w-full mt-6 h-full"
+              style={{
+                maxHeight: '90vh',
+                maxWidth: '90vw',
+                overflow: 'hidden',
+                margin: 'auto'
+              }}
+          >
+            <CardContent style={{cursor: 'pointer'}}>
+              <CardHeader className="text-neutral-500 font-bold text-2xl">
+                <div className="flex gap-6 items-center justify-center">
+                  <div>실시간 화면 공유</div>
+                </div>
+              </CardHeader>
+              {renderVideoContent()}
             </CardContent>
           </Card>
 
-          {/* Modals */}
-          <Modal isOpen={isModalOpen} onClose={handleCloseModal} ref={videoRef} />
-          <ImageModal isOpen={isImageModalOpen} onClose={handleCloseImageModal}
-                      imageSrc={canvasImage}/>
-          <DetectionModal isOpen={isDetectionModalOpen}
-                          onClose={handleCloseDetectionModal}
-                          imageSrc={images[images.length - 1]?.data}/>
+          <Modal isOpen={isModalOpen} onClose={handleCloseModal}
+                 ref={videoRef}/>
+          <ImageModal
+              isOpen={isImageModalOpen}
+              onClose={handleCloseImageModal}
+              imageSrc={canvasImage}
+          />
+          <DetectionModal
+              isOpen={isDetectionModalOpen}
+              onClose={handleCloseDetectionModal}
+              imageSrc={images[images.length - 1]?.data}
+          />
         </div>
-
       </>
   );
 };

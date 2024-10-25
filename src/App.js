@@ -9,6 +9,7 @@ import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
 import Test3 from "./view/Test3";
 import ImageBoard from "./view/ImageList";
+import {ToastContainer} from "react-toastify";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -19,6 +20,7 @@ async function requestNotificationPermission() {
     alert("알림 허용을 해주세요.");
   }
 }
+
 
 function App() {
   useEffect(() => {
@@ -42,8 +44,8 @@ function App() {
             <Route path="/test2" element={<Test2/>}/>
             <Route path="/test3" element={<Test3/>}/>
           </Routes>
-
         </Box>
+        {/* Same as */}
       </>
   );
 }

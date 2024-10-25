@@ -22,15 +22,14 @@ export default function Example() {
   };
 
   return (
-      <Box sx={{ boxShadow: 1, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB" }}>
-        <Sidebar>
+      <Box sx={{ boxShadow: 0, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB" }}>
           <Menu>
-            <MenuItem
-                icon={<MenuOutlinedIcon />}
-                onClick={() => {
-                  collapseSidebar();
-                }}
-            ></MenuItem>
+            {/*<MenuItem*/}
+            {/*    icon={<MenuOutlinedIcon />}*/}
+            {/*    onClick={() => {*/}
+            {/*      collapseSidebar();*/}
+            {/*    }}*/}
+            {/*></MenuItem>*/}
 
             {!collapsed && (
                 <Fade in={!collapsed} timeout={1200}>
@@ -98,7 +97,6 @@ export default function Example() {
               <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트3</MenuItem>
             </Link>
           </Menu>
-        </Sidebar>
       </Box>
   );
 }

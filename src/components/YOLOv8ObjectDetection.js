@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as ort from 'onnxruntime-web';
 
-const YOLOv8ObjectDetection = ({ capturedFile }) => {
+const YOLOv8ObjectDetection = ({capturedFile}) => {
   const [image, setImage] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const canvasRef = useRef(null);
   const [alertShown, setAlertShown] = useState(false); // 경고 표시 여부 관리
-  const [num , setNum] = useState(0);
+  const [num, setNum] = useState(0);
 
   useEffect(() => {
     // 컴포넌트가 마운트될 때 IndexedDB를 초기화
@@ -42,7 +42,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
-        db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+        db.createObjectStore("images", {keyPath: "id", autoIncrement: true});
       };
     });
   }
@@ -58,7 +58,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
         deleteRequest.onsuccess = () => {
           // 모든 데이터 삭제가 완료된 후 새 이미지 추가
-          const imageObject = { data: imageData }; // 이미지 데이터 객체 생성
+          const imageObject = {data: imageData}; // 이미지 데이터 객체 생성
           const addRequest = store.add(imageObject); // 이미지 추가
 
           addRequest.onsuccess = () => {
@@ -79,7 +79,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
     });
   }
 
-
   // IndexedDB 열기 및 데이터베이스 설정
   function openDatabase() {
     return new Promise((resolve, reject) => {
@@ -97,7 +96,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
-        db.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+        db.createObjectStore("images", {keyPath: "id", autoIncrement: true});
       };
     });
   }
@@ -156,7 +155,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
         }
       });
 
-      // 2초 이내 중복 호출 방지
+      // 6초 이내 중복 호출 방지
       const currentTime = Date.now();
       if (alertDisplayed && currentTime - lastAlertTime > 6000) {
         handleMessage();
@@ -164,21 +163,33 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
         setLastAlertTime(currentTime); // 마지막 경고 시간을 업데이트
       }
 
-
       img.onload = null; // onload 이벤트 리스너 제거
     };
 
     img.onload = onLoadHandler; // 이미지 로드 완료 후 onLoadHandler 실행
   };
 
+  const sendNotification = () => {
+    if (Notification.permission === "granted") {
+      new Notification("[선정성]", {
+        body: `[선정성] - 선정성이 검출되었습니다.`,
+        icon: '/meer.ico' // 알림 아이콘 경로
+      });
+    } else {
+      alert("알림 권한이 없습니다.");
+    }
+  };
+
+
   const handleMessage = async () => {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        const registration = await navigator.serviceWorker.register(
+            '/service-worker.js');
 
         // 서비스 워커가 활성화된 경우에만 메시지 전송
         if (registration.active) {
-          registration.active.postMessage({ type: 'BACKGROUND_SYNC' });
+          registration.active.postMessage({type: 'BACKGROUND_SYNC'});
         } else {
           // 서비스 워커가 아직 활성화되지 않은 경우 이벤트 리스너 추가
           navigator.serviceWorker.addEventListener('message', (event) => {
@@ -187,6 +198,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
         }
       } catch (error) {
         console.error('Service Worker registration failed:', error);
+        sendNotification();
       }
     }
   };
@@ -251,7 +263,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const runModel = async (input) => {
     const model = await ort.InferenceSession.create("nude.onnx");
     input = new ort.Tensor(Float32Array.from(input), [1, 3, 320, 320]);
-    const outputs = await model.run({ images: input });
+    const outputs = await model.run({images: input});
     return outputs["output0"].data;
   };
 
@@ -332,9 +344,20 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   ];
 
   return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
         {/*<input id="uploadInput" type="file" onChange={(e) => handleFileChange(e.target.files[0])} />*/}
-        <canvas hidden={true} ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'contain', marginTop: '10px' }} />
+        <canvas hidden={true} ref={canvasRef} style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          marginTop: '10px'
+        }}/>
         {image && drawImageAndBoxes(image, boxes)}
       </div>
   );
