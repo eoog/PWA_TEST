@@ -15,7 +15,6 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   }, []); // 빈 배열로 한 번만 실행
 
   useEffect(() => {
-    console.log("캡쳐 ==" , capturedFile)
     if (capturedFile) {
       handleFileChange(capturedFile);
     }

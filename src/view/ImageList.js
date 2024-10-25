@@ -9,6 +9,12 @@ const ImageBoard = () => {
   const [selectedImageId, setSelectedImageId] = useState(null); // 선택된 이미지의 ID
   const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
 
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream, videoRef]);
+
   // IndexedDB에서 이미지 데이터를 불러오는 함수
   function loadImagesFromIndexedDB() {
     return new Promise((resolve, reject) => {
@@ -146,7 +152,8 @@ const ImageBoard = () => {
               <p className="text-gray-500">이미지를 선택하세요.</p>
           )}
         </div>
-
+        <video ref={videoRef} hidden={true} autoPlay playsInline
+               style={{width: '10%', height: 'auto'}}/>
       </div>
 
   );

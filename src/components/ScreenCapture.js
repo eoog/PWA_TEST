@@ -10,12 +10,11 @@ function ScreenCapture({ setCapturedFile }) {
 
   // 데이터 요청 함수
   const requestShareAndContent = () => {
-    console.log("Requesting URL content...");
     window.postMessage({
       type: "SHARE",
       source: "SHARE",
       identifier: EXTENSION_IDENTIFIER
-    }, "*");
+    }, "*")
   };
 
   useEffect(() => {
@@ -29,9 +28,8 @@ function ScreenCapture({ setCapturedFile }) {
 
   const StartStream = async () => {
     try {
-
-      setIsSharing(true);
       requestShareAndContent();
+      setIsSharing(true);
 
       // 캡처 간격에 맞춰 캡처 호출
       const intervalId = setInterval(() => {

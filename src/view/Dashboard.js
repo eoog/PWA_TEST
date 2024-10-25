@@ -6,18 +6,21 @@ import ImageModal from "../components/ImageModal";
 import DetectionModal from "../components/DetectionModal";
 
 const Dashboard = () => {
-  const { stream, videoRef } = useContext(ScreenShareContext);
+  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 상태 관리
   const [isImageModalOpen , setImageModalOpen] = useState(false) // 이미지 모달
   const [isDetectionModalOpen , setDetectionModalOpen] = useState(false) // 이미지 모달
+
+
+
+  const [canvasImage, setCanvasImage] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState("");
+
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
     }
-  }, [stream]);
-
-  const [canvasImage, setCanvasImage] = useState(null);
-  const [currentDateTime, setCurrentDateTime] = useState("");
+  }, [stream, videoRef]);
 
   useEffect(() => {
     const loadImages = () => {
@@ -25,12 +28,6 @@ const Dashboard = () => {
         setCanvasImage(loadedImages); // 불러온 이미지 목록을 상태에 저장
       });
     };
-    // const getImageFromLocalStorage = () => {
-    //   const image = localStorage.getItem('canvasImage');
-    //   if (image) {
-    //     setCanvasImage(image);
-    //   }
-    // };
 
     // 현재 날짜와 시간을 설정하는 함수
     const updateCurrentDateTime = () => {
@@ -190,68 +187,53 @@ const Dashboard = () => {
       <>
         <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col">
           {/* Top three cards */}
-          <div className="grid grid-cols-3 gap-6" style={{flex: '0 0 45%'}}>
+          <div className="grid grid-cols-2 gap-6">
             <Card className="h-full">
-              <CardHeader className="text-neutral-500 text-2xl">실시간 화면 공유 현황</CardHeader>
-              <CardContent className="h-full items-center justify-center flex" onClick={handleOpenModal} style={{ cursor: 'pointer' }}>
-                <div className="h-full items-center justify-center flex" style={{ width: '100%', height: '380px' }}>
-                  {stream ? (
+              <CardContent className="h-full items-center justify-center"
+                           onClick={handleOpenImageModal}
+                           style={{cursor: 'pointer'}}>
+                <CardHeader className="text-neutral-500 font-bold text-2xl">
+                  <div className="flex gap-6 items-center justify-center">
+                    <div>
+                      3초간 화면 캡쳐 현황
+                    </div>
+                  </div>
+                </CardHeader>
+                <div className="items-center flex justify-center">
+                  {canvasImage ? (
                       <div>
-                      <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                      />
+                        <img src={canvasImage} alt="Canvas"/>
                       </div>
                   ) : (
                       <div className="">
-                        <img className="flex justify-center m-auto" src={require('../meer.ico')} />
-                        <p className="flex justify-center text-neutral-500 text-xl">화면 공유를 시작 해주세요.</p>
+                        <img className="flex justify-center m-auto"
+                             src={require('../meer.ico')} alt=""/>
+                        <p className="flex justify-center text-neutral-500 text-xl">저장된
+                          이미지가 없습니다.</p>
                       </div>
                   )}
                 </div>
               </CardContent>
             </Card>
             <Card className="h-full">
-              <CardHeader className="text-neutral-500 text-2xl">3초간 화면 캡쳐 현황</CardHeader>
-              <CardContent className="h-full items-center justify-center flex" onClick={handleOpenImageModal} style={{ cursor: 'pointer' }}>
-              <div className="items-center flex justify-center">
-                {canvasImage ? (
-                    <>
-                      <div>
-                      <img src={canvasImage} alt="Canvas" />
-                      {/*<p className="flex justify-center items-center mt-2 text-xl">{currentDateTime}</p> /!* 현재 날짜와 시간 표시 *!/*/}
-                      </div>
-                    </>
-                ) : (
-                    <div className="">
-                      <img className="flex justify-center m-auto"
-                           src={require('../meer.ico')} alt={""}/>
-                      <p className="flex justify-center text-neutral-500 text-xl">저장된 이미지가 없습니다.</p>
-                    </div>
-                )}
-              </div>
-              </CardContent>
-            </Card>
-            <Card className="h-full">
-              <CardHeader className="text-neutral-500 text-2xl">실시간 선정성 검출
-                현황</CardHeader>
-              <CardContent className="h-full items-center justify-center flex"
+              <CardContent className="h-full items-center justify-center"
                            onClick={handleOpenDetectionModal}
                            style={{cursor: 'pointer'}}>
+                <CardHeader className="text-neutral-500 font-bold text-2xl">
+                  <div className="flex gap-6 items-center justify-center">
+                    <div>실시간 선정성 검출 현황</div>
+                  </div>
+                </CardHeader>
                 <div className="">
                   {images.length > 0 ? (
-                      <div className="">
-                        <img
-                            src={images[images.length - 1]?.data}
-                            alt="Selected"
-
-                        />
+                      <div>
+                        <img src={images[images.length - 1]?.data}
+                             alt="Selected"/>
                       </div>
                   ) : (
                       <div className="">
                         <img className="flex justify-center m-auto"
-                             src={require('../meer.ico')}/>
+                             src={require('../meer.ico')} alt=""/>
                         <p className="flex justify-center text-neutral-500 text-xl">검출된
                           이미지가 없습니다.</p>
                       </div>
@@ -262,16 +244,35 @@ const Dashboard = () => {
           </div>
 
           {/* Large card below */}
-          <Card className="w-full mt-6" style={{flex: '0 0 55%'}}>
+          <Card className="w-full mt-6 h-full"
+                style={{
+                  maxHeight: '90vh',
+                  maxWidth: '90vw',
+                  overflow: 'hidden',
+                  margin: 'auto'
+                }}>
             <CardHeader>Large Card</CardHeader>
             <CardContent>
-
+              <video ref={videoRef} autoPlay playsInline
+                     onClick={handleOpenModal}
+                     style={{
+                       width: '100%',
+                       height: 'auto',
+                       maxHeight: '90vh'
+                     }}/>
+              {/* 영상 높이를 90vh로 제한 */}
             </CardContent>
           </Card>
+
+          {/* Modals */}
           <Modal isOpen={isModalOpen} onClose={handleCloseModal} ref={videoRef} />
-          <ImageModal isOpen={isImageModalOpen} onClose={handleCloseImageModal} imageSrc={canvasImage} />
-          <DetectionModal isOpen={isDetectionModalOpen} onClose={handleCloseDetectionModal} imageSrc={images[images.length - 1]?.data} />
+          <ImageModal isOpen={isImageModalOpen} onClose={handleCloseImageModal}
+                      imageSrc={canvasImage}/>
+          <DetectionModal isOpen={isDetectionModalOpen}
+                          onClose={handleCloseDetectionModal}
+                          imageSrc={images[images.length - 1]?.data}/>
         </div>
+
       </>
   );
 };

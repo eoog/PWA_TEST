@@ -7,15 +7,18 @@ import reportWebVitals from './reportWebVitals';
 import {ProSidebarProvider} from 'react-pro-sidebar';
 import Pro from "./pro";
 import {ScreenShareProvider} from "./components/ScreenShareProvider";
+import {BrowserRouter} from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+    <BrowserRouter>  {/* BrowserRouter로 App 감싸기 */}
     <ScreenShareProvider>
       <ProSidebarProvider>
         <Pro/>
         <App/>
       </ProSidebarProvider>
     </ScreenShareProvider>
+    </BrowserRouter>
 );
 
 // If you want your app to work offline and load faster, you can change
