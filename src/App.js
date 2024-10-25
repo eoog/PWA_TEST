@@ -7,6 +7,7 @@ import GambleView from "./view/GambleView";
 import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
+import Test3 from "./view/Test3";
 import ImageBoard from "./view/ImageList";
 
 async function requestNotificationPermission() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
             <Route path="/test2" element={<Test2/>}/>
+            <Route path="/test3" element={<Test3/>}/>
           </Routes>
 
         </Box>
