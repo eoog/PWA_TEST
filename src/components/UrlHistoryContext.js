@@ -10,7 +10,7 @@ export const UrlHistoryProvider = ({ children }) => {
 
   // 데이터 요청 함수
   const requestUrlsAndContent = () => {
-    console.log("URL과 콘텐츠를 요청합니다...");
+    // console.log("URL과 콘텐츠를 요청합니다...");
     window.postMessage(
         {
           type: "HHH",
@@ -24,7 +24,7 @@ export const UrlHistoryProvider = ({ children }) => {
   // 메시지 리스너 설정
   useEffect(() => {
     const messageListener = (event) => {
-      console.log("Received message:", event.data);
+      // console.log("Received message:", event.data);
       if (
           event.data.type === "HHH" &&
           event.data.source === EXTENSION_IDENTIFIER
