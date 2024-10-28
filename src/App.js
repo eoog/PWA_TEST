@@ -8,6 +8,7 @@ import ImageBoard from "./view/ImageList";
 import InstallGuide from "./view/installGuide";
 import TextViewWrapper from "./components/TextViewWrapper";
 import DemoInstallGuide from "./components/DemoInstallGuide";
+import TextView from "./view/TextView";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -45,6 +46,7 @@ function App() {
             {/*<Route path="/" element={<Dashboard />} />*/}
             <Route path="/" element={<Dashboard/>}/>
             <Route path="/board" element={<ImageBoard/>}/>
+            <Route path="/text" element={<TextView/>}/>
             <Route path="/text-view" element={<TextViewWrapper/>}/>
             <Route path="/install-guide" element={<InstallGuide />} />
             <Route path="/demo-install-guide" element={<DemoInstallGuide />} />

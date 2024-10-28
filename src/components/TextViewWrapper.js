@@ -31,7 +31,7 @@ const TextViewWrapper = () => {
         // return <Navigate to="/install-guide" replace />;
     }
     console.log('확장프로그램 설치 되어 있음');
-    return <TextView />;
+    return <Navigate to="/text" replace />;
 };
 
 export default TextViewWrapper;
