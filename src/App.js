@@ -10,6 +10,7 @@ import InstallGuide from "./view/installGuide";
 import TextViewWrapper from "./components/TextViewWrapper";
 import DemoInstallGuide from "./components/DemoInstallGuide";
 import TextView from "./view/TextView";
+import TextDetectView from "./view/TextdetectResult";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -45,6 +46,8 @@ function App() {
             <Route path="/text-view" element={<TextViewWrapper/>}/>
             <Route path="/install-guide" element={<InstallGuide />} />
             <Route path="/demo-install-guide" element={<DemoInstallGuide />} />
+            <Route path="/text-result" element={<TextDetectView/>} />
+
           </Routes>
         </Box>
         {/* Same as */}

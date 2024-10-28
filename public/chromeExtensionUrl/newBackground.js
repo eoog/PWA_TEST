@@ -1,31 +1,43 @@
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
-// 탭에서 컨텐츠 추출하는 함수
-async function getTabContent(tab) {
+// 탭에서 컨텐츠와 스크린샷을 추출하는 함수
+async function getTabContentAndScreenshot(tab) {
   try {
     const results = await chrome.scripting.executeScript({
       target: {tabId: tab.id},
       function: () => document.body.innerText
     });
-    return results[0]?.result || '내용을 가져올 수 없습니다';
+    
+    const screenshot = await chrome.tabs.captureVisibleTab(null, {
+      format: 'jpeg',
+      quality: 50
+    });
+
+    return {
+      content: results[0]?.result || '내용을 가져올 수 없습니다',
+      screenshot: screenshot
+    };
   } catch (error) {
     console.error('탭 내용 가져오기 오류:', error);
-    return '내용을 가져올 수 없습니다';
+    return {
+      content: '내용을 가져올 수 없습니다',
+      screenshot: null
+    };
   }
 }
 
-// 활성화된 탭의 데이터 수집하는 함수
 async function collectTabsData() {
   try {
     const tabs = await chrome.tabs.query({active: true});
     const tabsData = [];
 
     for (const tab of tabs) {
-      const content = await getTabContent(tab);
+      const { content, screenshot } = await getTabContentAndScreenshot(tab);
       tabsData.push({
         url: tab.url,
         title: tab.title,
-        content: content
+        content: content,
+        screenshot: screenshot
       });
     }
 
@@ -36,79 +48,15 @@ async function collectTabsData() {
   }
 }
 
-// 탭의 변경을 감지하고 데이터 전송
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.active) {
-    collectTabsData().then(tabsData => {
-      chrome.tabs.sendMessage(tabId, {
-        type: "TABS_DATA_RESPONSE",
-        source: EXTENSION_IDENTIFIER,
-        data: tabsData
-      });
-    });
-  }
-
-    HHHH().then(tabsData => {
-      HHHURL(tabsData[0].tab).then(result => {
-        chrome.tabs.sendMessage(tabId, {
-          type: "HHH",
-          source: EXTENSION_IDENTIFIER,
-          data: result
-        });
-      })
-    });
-
-  return true
-});
-
-// content script로부터의 메시지 수신
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // 탭의 데이터 요청
-  if (request.type === "REQUEST_TABS_DATA") {
-    collectTabsData().then(tabsData => {
-      chrome.tabs.sendMessage(sender.tab.id, {
-        type: "TABS_DATA_RESPONSE",
-        source: EXTENSION_IDENTIFIER,
-        data: tabsData
-      });
-    });
-  }
-  // 화면 공유하기 연결시 브라우저 최소화
-  if (request.action === "minimize_window") {
-    chrome.windows.getCurrent((window) => {
-      chrome.windows.update(window.id, {state: 'minimized'});
-    });
-  }
-
-  if (request.type === "HHH") {
-    HHHH().then(tabsData => {
-      HHHURL(tabsData[0].tab).then(result => {
-        chrome.tabs.sendMessage(sender.tab.id, {
-          type: "HHH",
-          source: EXTENSION_IDENTIFIER,
-          data: result
-        });
-      })
-    });
-  }
-
-  return true;
-});
-
-// 활성화된 탭의 데이터 수집하는 함수
 async function HHHURL(tab) {
   try {
-
-    const tabsData = [];
-
-    const content = await getTabContent(tab);
-    tabsData.push({
+    const { content, screenshot } = await getTabContentAndScreenshot(tab);
+    return [{
       url: tab.url,
       title: tab.title,
-      content: content
-    });
-
-    return tabsData;
+      content: content,
+      screenshot: screenshot
+    }];
   } catch (error) {
     console.error('탭 데이터 수집 실패:', error);
     return [];
@@ -117,32 +65,83 @@ async function HHHURL(tab) {
 
 async function HHHH() {
   try {
-    const tabsData = [];
+    const [allWindows, currentWindow] = await Promise.all([
+      chrome.windows.getAll({populate: true}),
+      chrome.windows.getCurrent()
+    ]);
 
-    // 모든 창을 가져오는 Promise 래퍼 함수
-    const allWindows = await new Promise(
-        (resolve) => chrome.windows.getAll({populate: true}, resolve));
-    const currentWindow = await new Promise(
-        (resolve) => chrome.windows.getCurrent(resolve));
-
-
-    // 현재 창과 일치하는 창의 활성 탭만 필터링하여 저장
-    allWindows.forEach(window => {
-      if (window.id === currentWindow.id) {  // 현재 창과 ID가 같은 창 필터링
-        window.tabs.forEach(tab => {
-          if (tab.active) {
-            tabsData.push({
-              tab: tab
-            });
-          }
-        });
-      }
-    });
-
-    return tabsData;
-
+    return allWindows
+      .filter(window => window.id === currentWindow.id)
+      .flatMap(window => window.tabs.filter(tab => tab.active))
+      .map(tab => ({ tab }));
   } catch (error) {
     console.error('탭 데이터 수집 실패:', error);
     return [];
   }
 }
+
+// 탭 업데이트 리스너
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.active) {
+    (async () => {
+      try {
+        const tabsData = await collectTabsData();
+        await chrome.tabs.sendMessage(tabId, {
+          type: "TABS_DATA_RESPONSE",
+          source: EXTENSION_IDENTIFIER,
+          data: tabsData
+        });
+
+        const hhhData = await HHHH();
+        if (hhhData.length > 0) {
+          const result = await HHHURL(hhhData[0].tab);
+          await chrome.tabs.sendMessage(tabId, {
+            type: "HHH",
+            source: EXTENSION_IDENTIFIER,
+            data: result
+          });
+        }
+      } catch (error) {
+        console.error('탭 업데이트 처리 중 오류:', error);
+      }
+    })();
+  }
+});
+
+// 메시지 리스너
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  (async () => {
+    try {
+      if (request.type === "REQUEST_TABS_DATA") {
+        const tabsData = await collectTabsData();
+        await chrome.tabs.sendMessage(sender.tab.id, {
+          type: "TABS_DATA_RESPONSE",
+          source: EXTENSION_IDENTIFIER,
+          data: tabsData
+        });
+      }
+
+      if (request.action === "minimize_window") {
+        const window = await chrome.windows.getCurrent();
+        await chrome.windows.update(window.id, {state: 'minimized'});
+      }
+
+      if (request.type === "HHH") {
+        const hhhData = await HHHH();
+        if (hhhData.length > 0) {
+          const result = await HHHURL(hhhData[0].tab);
+          await chrome.tabs.sendMessage(sender.tab.id, {
+            type: "HHH",
+            source: EXTENSION_IDENTIFIER,
+            data: result
+          });
+        }
+      }
+    } catch (error) {
+      console.error('메시지 처리 중 오류:', error);
+    }
+  })();
+
+  // 비동기 응답을 사용하지 않으므로 false 반환
+  return false;
+});

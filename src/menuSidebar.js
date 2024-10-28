@@ -85,6 +85,11 @@ export default function MenuSidebar() {
                 <p style={{textDecoration:"none"}}>현재 탭 텍스트</p>
               </MenuItem>
             </Link>
+            <Link to="/text-result ">
+              <MenuItem style={getMenuItemStyle("/TextDetectView ")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>도박성 텍스트 결과</p>
+              </MenuItem>
+            </Link>
           </Menu>
       </Box>
   );

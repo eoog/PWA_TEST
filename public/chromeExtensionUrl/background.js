@@ -17,6 +17,8 @@ async function getTabContent(tab) {
   }
 }
 
+
+
 // 활성화된 탭의 데이터 수집
 async function collectTabsData() {
   try {
