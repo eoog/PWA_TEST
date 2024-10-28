@@ -19,12 +19,6 @@ export const ExtensionProvider = ({ children }) => {
 
             // 설치되지 않았고, 현재 설치 가이드 페이지가 아니라면 리디렉션
             if (!installed && !location.pathname.includes('install-guide')) {
-                // 알림 권한이 허용되어 있을 때만 알림 표시
-                if(Notification.permission === 'granted') {
-                    new Notification('확장 프로그램 알림', {
-                        body: '확장 프로그램이 비활성화되었습니다. 서비스 이용을 위해 다시 설치해주세요.',
-                    });
-                }
                 navigate('/demo-install-guide', { replace: true });
             }
 
