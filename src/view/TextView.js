@@ -1,10 +1,14 @@
 import {Card} from "../components/ui/card";
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import {UrlHistoryContext} from "../components/UrlHistoryContext";
 
 
 const TextView = () => {
   const urlHistory = useContext(UrlHistoryContext);
+
+  useEffect(() => {
+    console.log("결과값 == " , urlHistory[0])
+  }, [urlHistory]);
   return (
       <>
         <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col">

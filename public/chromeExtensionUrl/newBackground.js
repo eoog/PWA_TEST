@@ -58,6 +58,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       })
     });
 
+  return true
 });
 
 // content script로부터의 메시지 수신

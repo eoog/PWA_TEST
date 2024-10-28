@@ -1,16 +1,14 @@
 import { Box, Fade } from "@mui/material";
 import React from "react";
 import {
-  Sidebar,
   Menu,
   MenuItem,
   useProSidebar,
 } from "react-pro-sidebar";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Link, useLocation } from "react-router-dom";
 
-export default function Example() {
+export default function MenuSidebar() {
   const { collapseSidebar, collapsed } = useProSidebar();
   const location = useLocation(); // 현재 경로를 가져오기
 
@@ -82,8 +80,8 @@ export default function Example() {
                 <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
               </MenuItem>
             </Link>
-            <Link to="/text">
-              <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>
+            <Link to="/text-view">
+              <MenuItem style={getMenuItemStyle("/text-view")} icon={<HomeOutlinedIcon />}>
                 <p style={{textDecoration:"none"}}>현재 탭 텍스트</p>
               </MenuItem>
             </Link>

@@ -31,14 +31,14 @@ const Dashboard = () => {
   const renderVideoContent = () => {
     if (!stream) {
       return (
-          <div className="flex flex-col items-center justify-center h-[50vh] text-neutral-500">
+          <div onClick={() => window.location.reload()} className="flex flex-col items-center justify-center h-[50vh] text-neutral-500">
             <img
                 className="w-24 h-24 mb-4"
                 src={require('../meer.ico')}
                 alt="Placeholder icon"
             />
             <p className="text-xl font-semibold">화면 공유가 시작되지 않았습니다</p>
-            <p className="mt-2" onClick={() => window.location.reload()}>화면 공유를 시작하려면 클릭하세요</p>
+            <p className="mt-2">화면 공유를 시작하려면 클릭하세요</p>
           </div>
       );
     }
