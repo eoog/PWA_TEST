@@ -8,15 +8,18 @@ import {ProSidebarProvider} from 'react-pro-sidebar';
 import Pro from "./pro";
 import {ScreenShareProvider} from "./components/ScreenShareProvider";
 import {BrowserRouter} from "react-router-dom";
+import {UrlHistoryProvider} from "./components/UrlHistoryContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <BrowserRouter>  {/* BrowserRouter로 App 감싸기 */}
     <ScreenShareProvider>
+      <UrlHistoryProvider>
       <ProSidebarProvider>
         <Pro/>
         <App/>
       </ProSidebarProvider>
+      </UrlHistoryProvider>
     </ScreenShareProvider>
     </BrowserRouter>
 );

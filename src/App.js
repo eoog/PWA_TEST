@@ -2,14 +2,14 @@ import React, {useEffect} from 'react';
 import './App.css';
 import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
 import {Box} from '@mui/material';
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useLocation} from "react-router-dom";
 import GambleView from "./view/GambleView";
 import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
 import Test3 from "./view/Test3";
 import ImageBoard from "./view/ImageList";
-import {ToastContainer} from "react-toastify";
+import TextView from "./view/TextView";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -17,15 +17,23 @@ async function requestNotificationPermission() {
     console.log('Notification permission granted.');
   } else {
     console.log('Notification permission denied.');
-    alert("알림 허용을 해주세요.");
+    await Notification.requestPermission();
   }
 }
 
 
 function App() {
+  const location = useLocation();
   useEffect(() => {
     requestNotificationPermission();
   }, []);
+
+  useEffect(() => {
+    // 여기에 라우터 이동 시마다 실행할 코드를 작성합니다.
+    console.log('Current location:', location.pathname);
+
+    // 필요에 따라 다른 작업을 추가할 수 있습니다.
+  }, [location]); // location이 변경될 때마다 useEffect가 실행됩니다.
 
   return (
       <>
@@ -39,6 +47,7 @@ function App() {
             {/*<Route path="/" element={<Dashboard />} />*/}
             <Route path="/" element={<Dashboard/>}/>
             <Route path="/board" element={<ImageBoard/>}/>
+            <Route path="/text" element={<TextView/>}/>
             <Route path="/a" element={<GambleView/>}/>
             <Route path="/test" element={<Test/>}/>
             <Route path="/test2" element={<Test2/>}/>
