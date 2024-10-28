@@ -84,22 +84,8 @@ export default function Example() {
             </Link>
             <Link to="/text">
               <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>
-                <p style={{textDecoration:"none"}}>텍스트</p>
+                <p style={{textDecoration:"none"}}>현재 탭 텍스트</p>
               </MenuItem>
-            </Link>
-            <Link to="/a">
-              <MenuItem style={getMenuItemStyle("/a")} icon={<HomeOutlinedIcon />}>
-                룰루랄라
-              </MenuItem>
-            </Link>
-            <Link to="/test">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트</MenuItem>
-            </Link>
-            <Link to="/test2">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트2</MenuItem>
-            </Link>
-            <Link to="/test3">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트3</MenuItem>
             </Link>
           </Menu>
       </Box>
