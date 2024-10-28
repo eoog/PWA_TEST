@@ -4,6 +4,7 @@ import {UrlHistoryContext} from "../components/UrlHistoryContext";
 
 
 const TextView = () => {
+    console.log('TextView');
   const urlHistory = useContext(UrlHistoryContext);
 
   useEffect(() => {

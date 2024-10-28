@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import {checkExtensionInstalled} from "./extensionCheck";
+import { checkExtensionInstalled } from "./extensionCheck";
 import TextView from "../view/TextView";
 
 const TextViewWrapper = () => {
@@ -17,7 +17,7 @@ const TextViewWrapper = () => {
 
     if (isExtensionInstalled === null) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="flex-1 h-full w-full flex items-center justify-center">
                 <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
             </div>
         );
@@ -25,10 +25,13 @@ const TextViewWrapper = () => {
 
     if (!isExtensionInstalled) {
         console.log('확장프로그램 설치 안되어 있음');
-        return <Navigate to="/install-guide" replace />;
+        // 웹 스토어 버전 출시 전에는 데모 설치 가이드로 이동
+        return <Navigate to="/demo-install-guide" replace />;
+        // 웹 스토어 버전 출시 후에는 아래 코드로 변경
+        // return <Navigate to="/install-guide" replace />;
     }
     console.log('확장프로그램 설치 되어 있음');
-    return <TextView />;
+    return <Navigate to="/text" replace />;
 };
 
 export default TextViewWrapper;
