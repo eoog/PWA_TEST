@@ -9,7 +9,6 @@ import Dashboard from "./view/Dashboard";
 import Test2 from "./view/Test2";
 import Test3 from "./view/Test3";
 import ImageBoard from "./view/ImageList";
-import {ToastContainer} from "react-toastify";
 import TextView from "./view/TextView";
 
 async function requestNotificationPermission() {
