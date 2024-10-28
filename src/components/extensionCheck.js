@@ -3,6 +3,7 @@ export const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
  * 확장 프로그램이 설치되어 있는지 확인합니다.
  * */
 export const checkExtensionInstalled = () => {
+    console.log('checkExtensionInstalled 호출');
     return new Promise((resolve) => {
         // Extension이 설치되어 있는지 확인하기 위한 메시지 전송
         window.postMessage({
@@ -24,7 +25,6 @@ export const checkExtensionInstalled = () => {
                 resolve(true);
             }
         };
-
         window.addEventListener("message", messageListener);
     });
 };

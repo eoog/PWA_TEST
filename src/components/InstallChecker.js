@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { checkExtensionInstalled } from "./extensionCheck";
 import TextView from "../view/TextView";
 
-const TextViewWrapper = () => {
+const InstallChecker = () => {
     const [isExtensionInstalled, setIsExtensionInstalled] = useState(null);
 
     useEffect(() => {
@@ -31,7 +31,7 @@ const TextViewWrapper = () => {
         // return <Navigate to="/install-guide" replace />;
     }
     console.log('확장프로그램 설치 되어 있음');
-    return <Navigate to="/text" replace />;
+    return <Navigate to="/dashboard" replace />;
 };
 
-export default TextViewWrapper;
+export default InstallChecker;

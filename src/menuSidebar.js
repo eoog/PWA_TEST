@@ -80,9 +80,9 @@ export default function MenuSidebar() {
                 <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
               </MenuItem>
             </Link>
-            <Link to="/text-view">
-              <MenuItem style={getMenuItemStyle("/text-view")} icon={<HomeOutlinedIcon />}>
-                <p style={{textDecoration:"none"}}>현재 탭 텍스트</p>
+            <Link to="/text">
+              <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>탭 정보(텍스트)</p>
               </MenuItem>
             </Link>
           </Menu>

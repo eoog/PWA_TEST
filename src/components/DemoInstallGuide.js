@@ -85,18 +85,46 @@ const DemoInstallGuide = () => {
         }
     };
 
-    // 설치 확인 로직
+    // // 설치 확인 로직
+    // useEffect(() => {
+    //     const checkInterval = setInterval(async () => {
+    //         console.log('Checking extension installed...');
+    //         const installed = await checkExtensionInstalled();
+    //         if (installed) {
+    //             setIsInstalled(true);
+    //             clearInterval(checkInterval);
+    //             setTimeout(() => navigate('/text'), 1500);
+    //         }
+    //     }, 2000);
+    //
+    //     return () => clearInterval(checkInterval);
+    // }, [navigate]);
+
     useEffect(() => {
         const checkInterval = setInterval(async () => {
-            const installed = await checkExtensionInstalled();
-            if (installed) {
-                setIsInstalled(true);
-                clearInterval(checkInterval);
-                setTimeout(() => navigate('/text-view'), 1500);
-            }
-        }, 2000);
+            try {
+                const installed = await checkExtensionInstalled();
+                console.log('Extension installation check:', installed);
 
-        return () => clearInterval(checkInterval);
+                if (installed) {
+                    setIsInstalled(true);
+                    clearInterval(checkInterval);
+                    // 설치 확인 후 대시보드로 이동
+                    setTimeout(() => {
+                        console.log('Redirecting to dashboard...');
+                        navigate('/dashboard');
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Extension check error:', error);
+            }
+        }, 2000); // 2초마다 확인
+
+        // 컴포넌트 언마운트시 인터벌 정리
+        return () => {
+            console.log('Cleaning up interval');
+            clearInterval(checkInterval);
+        };
     }, [navigate]);
 
     return (
@@ -109,6 +137,15 @@ const DemoInstallGuide = () => {
                                 <h1 className="text-3xl font-bold text-gray-900">
                                     URL Content Tracker 데모 버전 설치 가이드
                                 </h1>
+                                {isInstalled && (
+                                    <div className="text-green-600 font-semibold mt-4 flex items-center justify-center gap-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        확장 프로그램이 설치되었습니다! 잠시 후 대시보드로 이동됩니다...
+                                    </div>
+                                )}
                                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                                     개발자 모드를 사용하여 데모 버전 확장 프로그램을 설치합니다. <br/>
                                     아래 가이드를 따라 단계별로 설치를 진행해주세요.
@@ -188,9 +225,6 @@ const DemoInstallGuide = () => {
                                 <div className="text-sm text-gray-500 space-y-2">
                                     <p>
                                         ⚠️ 주의: 개발자 모드 설치는 데모 버전에만 해당됩니다.
-                                    </p>
-                                    <p>
-                                        정식 버전 출시 후에는 Chrome 웹 스토어를 통해 설치해 주세요.
                                     </p>
                                 </div>
                             </div>

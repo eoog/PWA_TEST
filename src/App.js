@@ -6,7 +6,7 @@ import {Route, Routes, useLocation} from "react-router-dom";
 import Dashboard from "./view/Dashboard";
 import ImageBoard from "./view/ImageList";
 import InstallGuide from "./view/installGuide";
-import TextViewWrapper from "./components/TextViewWrapper";
+import InstallChecker from "./components/InstallChecker";
 import DemoInstallGuide from "./components/DemoInstallGuide";
 import TextView from "./view/TextView";
 
@@ -34,14 +34,15 @@ function App() {
           display: 'flex',
           height: '100vh'
         }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
-          <MenuSidebar/> {/* 사이드바 컴포넌트 */}
+          {/* 사이드바 컴포넌트 */}
+          <MenuSidebar/>
 
           <Routes>
             {/*<Route path="/" element={<Dashboard />} />*/}
-            <Route path="/" element={<Dashboard/>}/>
+            <Route path="/" element={<InstallChecker/>}/>
+            <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/board" element={<ImageBoard/>}/>
             <Route path="/text" element={<TextView/>}/>
-            <Route path="/text-view" element={<TextViewWrapper/>}/>
             <Route path="/install-guide" element={<InstallGuide />} />
             <Route path="/demo-install-guide" element={<DemoInstallGuide />} />
           </Routes>
