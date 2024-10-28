@@ -7,6 +7,7 @@ import Dashboard from "./view/Dashboard";
 import ImageBoard from "./view/ImageList";
 import InstallGuide from "./view/installGuide";
 import TextViewWrapper from "./components/TextViewWrapper";
+import DemoInstallGuide from "./components/DemoInstallGuide";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -46,6 +47,7 @@ function App() {
             <Route path="/board" element={<ImageBoard/>}/>
             <Route path="/text-view" element={<TextViewWrapper/>}/>
             <Route path="/install-guide" element={<InstallGuide />} />
+            <Route path="/demo-install-guide" element={<DemoInstallGuide />} />
           </Routes>
         </Box>
         {/* Same as */}
