@@ -9,6 +9,7 @@ export const UrlHistoryProvider = ({ children }) => {
   const [urlHistory, setUrlHistory] = useState([]);
   const [isPaused, setIsPaused] = useState(false); // 요청 일시 중지 상태
 
+  // 확장프로그램과 통신
   // 데이터 요청 함수
   const requestUrlsAndContent = () => {
     // console.log("URL과 콘텐츠를 요청합니다...");
@@ -57,6 +58,8 @@ export const UrlHistoryProvider = ({ children }) => {
       clearInterval(intervalId);
       window.removeEventListener("message", messageListener);
     };
+
+    
   }, []); // isPaused 상태를 의존성으로 추가
 
   return (
