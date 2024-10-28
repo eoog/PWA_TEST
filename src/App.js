@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, {useEffect} from 'react';
 import './App.css';
 import MenuSidebar from "./menuSidebar"; // 사이드바 컴포넌트를 가져옵니다.

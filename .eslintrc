@@ -1,7 +1,0 @@
-// .eslintrc 파일의 예시
-{
-  "rules": {
-    "no-unused-vars": "warn",  // 미사용 변수는 경고만 출력
-    "react/prop-types": "off"  // PropTypes 관련 규칙 비활성화
-  }
-}
