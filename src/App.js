@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import './App.css';
-import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
+import MenuSidebar from "./menuSidebar"; // 사이드바 컴포넌트를 가져옵니다.
 import {Box} from '@mui/material';
 import {Route, Routes, useLocation} from "react-router-dom";
 import Dashboard from "./view/Dashboard";
@@ -38,7 +38,7 @@ function App() {
           display: 'flex',
           height: '100vh'
         }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
-          <Example/> {/* 사이드바 컴포넌트 */}
+          <MenuSidebar/> {/* 사이드바 컴포넌트 */}
 
           <Routes>
             {/*<Route path="/" element={<Dashboard />} />*/}

@@ -1,16 +1,14 @@
 import { Box, Fade } from "@mui/material";
 import React from "react";
 import {
-  Sidebar,
   Menu,
   MenuItem,
   useProSidebar,
 } from "react-pro-sidebar";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Link, useLocation } from "react-router-dom";
 
-export default function Example() {
+export default function MenuSidebar() {
   const { collapseSidebar, collapsed } = useProSidebar();
   const location = useLocation(); // 현재 경로를 가져오기
 
