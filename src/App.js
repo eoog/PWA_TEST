@@ -3,10 +3,10 @@ import './App.css';
 import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
 import {Box} from '@mui/material';
 import {Route, Routes, useLocation} from "react-router-dom";
-import GambleView from "./view/GambleView";
 import Dashboard from "./view/Dashboard";
 import ImageBoard from "./view/ImageList";
-import TextView from "./view/TextView";
+import InstallGuide from "./view/installGuide";
+import TextViewWrapper from "./components/TextViewWrapper";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -44,8 +44,8 @@ function App() {
             {/*<Route path="/" element={<Dashboard />} />*/}
             <Route path="/" element={<Dashboard/>}/>
             <Route path="/board" element={<ImageBoard/>}/>
-            <Route path="/text" element={<TextView/>}/>
-            <Route path="/a" element={<GambleView/>}/>
+            <Route path="/text-view" element={<TextViewWrapper/>}/>
+            <Route path="/install-guide" element={<InstallGuide />} />
           </Routes>
         </Box>
         {/* Same as */}
