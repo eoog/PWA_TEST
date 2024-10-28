@@ -167,6 +167,9 @@ const ImageBoard = () => {
                       alt={`이미지 ${currentImage.id}`}
                       className="max-w-full h-auto"
                       onClick={handleOpenDetectionModal}
+                      style={{
+                        cursor:"pointer"
+                      }}
                   />
                   <DetectionModal isOpen={isDetectionModalOpen}
                                   onClose={handleCloseDetectionModal}
