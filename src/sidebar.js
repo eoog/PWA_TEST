@@ -5,14 +5,10 @@ import {
   Menu,
   MenuItem,
   useProSidebar,
-  SubMenu,
 } from "react-pro-sidebar";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ArticleIcon from "@mui/icons-material/Article";
-import FolderSharedIcon from "@mui/icons-material/FolderShared";
+
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import {Link} from "react-router-dom";
 
 export default function Example() {
@@ -73,6 +69,9 @@ export default function Example() {
             </Link>
             <Link to="/a">
               <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>룰루랄라</MenuItem>
+            </Link>
+            <Link to="/c">
+              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>텍스트</MenuItem>
             </Link>
             {/*<Link to="/a">*/}
             {/*  <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>*/}

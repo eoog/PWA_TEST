@@ -6,12 +6,15 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { ProSidebarProvider } from 'react-pro-sidebar';
 import Pro from "./pro";
+import AppPsb from './AppPsb';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <ProSidebarProvider>
         <Pro />
     <App />
+        <AppPsb/>
+    
     </ProSidebarProvider>
 );
 
