@@ -25,12 +25,6 @@ function App() {
     requestNotificationPermission();
   }, []);
 
-  useEffect(() => {
-    // 여기에 라우터 이동 시마다 실행할 코드를 작성합니다.
-    console.log('Current location:', location.pathname);
-
-    // 필요에 따라 다른 작업을 추가할 수 있습니다.
-  }, [location]); // location이 변경될 때마다 useEffect가 실행됩니다.
 
   return (
       <>
