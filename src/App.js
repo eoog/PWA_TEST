@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다.
-import { Box } from '@mui/material';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Ar from "./view/a";
-import Br from "./view/b";
-import Cr from "./view/c";
+import {Box} from '@mui/material';
+import {Route, Routes} from "react-router-dom";
+import GambleView from "./view/GambleView";
+import Test from "./view/Test";
+import Dashboard from "./view/Dashboard";
+import Test2 from "./view/Test2";
+import Test3 from "./view/Test3";
+import ImageBoard from "./view/ImageList";
+import {ToastContainer} from "react-toastify";
 
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -17,27 +21,32 @@ async function requestNotificationPermission() {
   }
 }
 
-function App() {
-  const [capturedFile, setCapturedFile] = useState(null); // 캡처된 파일 상태
-  const [stream, setStream] = useState(null); // 스트림 상태 관리
 
+function App() {
   useEffect(() => {
     requestNotificationPermission();
   }, []);
 
   return (
-      <Router>
-        <Box sx={{ display: 'flex', height: '100vh' }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
-          <Example />  {/* 사이드바 컴포넌트 */}
+      <>
+        <Box sx={{
+          display: 'flex',
+          height: '100vh'
+        }}>  {/* 전체 화면을 수평으로 나누는 레이아웃 */}
+          <Example/> {/* 사이드바 컴포넌트 */}
 
           <Routes>
-            <Route path="/" element={<Ar />} />
-            <Route path="/a" element={<Br />} />
-            <Route path="/a" element={<Cr />} />
+            {/*<Route path="/" element={<Dashboard />} />*/}
+            <Route path="/" element={<Dashboard/>}/>
+            <Route path="/board" element={<ImageBoard/>}/>
+            <Route path="/a" element={<GambleView/>}/>
+            <Route path="/test" element={<Test/>}/>
+            <Route path="/test2" element={<Test2/>}/>
+            <Route path="/test3" element={<Test3/>}/>
           </Routes>
-
         </Box>
-      </Router>
+        {/* Same as */}
+      </>
   );
 }
 

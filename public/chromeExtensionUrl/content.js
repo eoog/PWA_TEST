@@ -9,6 +9,14 @@ window.addEventListener("message", (event) => {
     // background script에 데이터 요청
     chrome.runtime.sendMessage({ type: "REQUEST_TABS_DATA" });
   }
+
+  // 화면 공유하기 연결시 브라우저 최소화..
+  if (event.data.type === "SHARE" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+
+    chrome.runtime.sendMessage({ action: "minimize_window" });
+      console.log("안녕")
+  }
 });
 
 // background script로부터의 메시지 수신
@@ -24,3 +32,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }, "*");
   }
 });
+
+// DOM 변화 감지
+const observer = new MutationObserver(() => {
+  // 탭의 변화된 내용을 감지하고 background script에 요청
+  console.log("변화 감지!");
+  chrome.runtime.sendMessage({ type: "REQUEST_TABS_DATA" });
+});
+
+// body 태그의 변화를 감지
+observer.observe(document.body, { childList: true, subtree: true, characterData: true });

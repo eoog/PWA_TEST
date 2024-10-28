@@ -7,23 +7,29 @@ import {
   useProSidebar,
 } from "react-pro-sidebar";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import {Link} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Example() {
   const { collapseSidebar, collapsed } = useProSidebar();
+  const location = useLocation(); // 현재 경로를 가져오기
+
+  // 링크에 따라 배경 색상을 결정하는 함수
+  const getMenuItemStyle = (path) => {
+    return location.pathname === path
+        ? { backgroundColor: "darkgray", opacity: 0.4, color: "black" , textDecoration: "none"}
+        : { backgroundColor: "white", opacity: 0.4, color: "black" , textDecoration: "none" };
+  };
 
   return (
-      <Box sx={{ boxShadow: 1, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB"}}>
-        <Sidebar backgroundColor="#FBFBFB">
+      <Box sx={{ boxShadow: 0, textOverflow: 'ellipsis', backgroundColor: "#FBFBFB" }}>
           <Menu>
-            <MenuItem
-                icon={<MenuOutlinedIcon />}
-                onClick={() => {
-                  collapseSidebar();
-                }}
-            ></MenuItem>
+            {/*<MenuItem*/}
+            {/*    icon={<MenuOutlinedIcon />}*/}
+            {/*    onClick={() => {*/}
+            {/*      collapseSidebar();*/}
+            {/*    }}*/}
+            {/*></MenuItem>*/}
 
             {!collapsed && (
                 <Fade in={!collapsed} timeout={1200}>
@@ -41,16 +47,18 @@ export default function Example() {
                           width: 85,
                           height: 85,
                           borderRadius: 85,
-                          bgcolor: "#000000",
+                          bgcolor: "#fffff",
                         }}
-                    ></Box>
+                    >
+                      <img src={require('./meer.ico')} />
+                    </Box>
                     <Box
                         sx={{
                           color: "black",
                           mt: 2,
                         }}
                     >
-                      Knowwhersoft
+                      Knowwheresoft
                     </Box>
                     <Box
                         sx={{
@@ -59,31 +67,36 @@ export default function Example() {
                           fontSize: 12,
                         }}
                     >
-                      knowwhersoft
+                      knowwheresoft
                     </Box>
                   </Box>
                 </Fade>
             )}
             <Link to="/">
-            <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>
+              <MenuItem style={getMenuItemStyle("/")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>선정성-대시보드</p>
+              </MenuItem>
+            </Link>
+            <Link to="/board">
+              <MenuItem style={getMenuItemStyle("/board")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
+              </MenuItem>
             </Link>
             <Link to="/a">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>룰루랄라</MenuItem>
+              <MenuItem style={getMenuItemStyle("/a")} icon={<HomeOutlinedIcon />}>
+                룰루랄라
+              </MenuItem>
             </Link>
-            <Link to="/c">
-              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>텍스트</MenuItem>
+            <Link to="/test">
+              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트</MenuItem>
             </Link>
-            {/*<Link to="/a">*/}
-            {/*  <MenuItem style={{backgroundColor:"darkgray" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>선정성</MenuItem>*/}
-            {/*</Link>*/}
-            {/*<SubMenu icon={<FolderSharedIcon />} label="Projects">*/}
-            {/*  <MenuItem icon={<ArticleIcon />}> Project 1</MenuItem>*/}
-            {/*  <MenuItem icon={<ArticleIcon />}> Project-Project-Project</MenuItem>*/}
-            {/*  <MenuItem icon={<AddCircleOutlineIcon />}>Add Project</MenuItem>*/}
-            {/*</SubMenu>*/}
-            {/*<MenuItem icon={<PersonOutlineIcon />}>My Page</MenuItem>*/}
+            <Link to="/test2">
+              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트2</MenuItem>
+            </Link>
+            <Link to="/test3">
+              <MenuItem style={{backgroundColor:"white" , opacity : 0.4 , color:"black"}} icon={<HomeOutlinedIcon />}>도박 테스트3</MenuItem>
+            </Link>
           </Menu>
-        </Sidebar>
       </Box>
   );
 }

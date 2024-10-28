@@ -17,10 +17,10 @@ async function getTabContent(tab) {
   }
 }
 
-// 모든 탭의 데이터 수집
+// 활성화된 탭의 데이터 수집
 async function collectTabsData() {
   try {
-    const tabs = await chrome.tabs.query({});
+    const tabs = await chrome.tabs.query({active: true});
     const tabsData = [];
     
     for (const tab of tabs) {
@@ -53,3 +53,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true;
 });
+
+
+// 화면 공유하기 완료시 브라우저창 최소화.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "minimize_window") {
+    // 현재 창 가져오기
+    chrome.windows.getCurrent((window) => {
+      // 창 최소화
+      chrome.windows.update(window.id, { state: 'minimized' });
+    });
+
+    console.log("브라우저 창이 최소화되었습니다.");
+  }
+});
+
