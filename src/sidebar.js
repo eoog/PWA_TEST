@@ -82,6 +82,11 @@ export default function Example() {
                 <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
               </MenuItem>
             </Link>
+            <Link to="/text">
+              <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>
+                <p style={{textDecoration:"none"}}>텍스트</p>
+              </MenuItem>
+            </Link>
             <Link to="/a">
               <MenuItem style={getMenuItemStyle("/a")} icon={<HomeOutlinedIcon />}>
                 룰루랄라

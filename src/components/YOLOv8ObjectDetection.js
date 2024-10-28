@@ -169,7 +169,8 @@ const YOLOv8ObjectDetection = ({capturedFile}) => {
     img.onload = onLoadHandler; // 이미지 로드 완료 후 onLoadHandler 실행
   };
 
-  const sendNotification = () => {
+  const sendNotification = async () => {
+    const permission = await Notification.requestPermission();
     if (Notification.permission === "granted") {
       new Notification("[선정성]", {
         body: `[선정성] - 선정성이 검출되었습니다.`,

@@ -46,7 +46,21 @@ window.addEventListener("message", (event) => {
         event.data.identifier === EXTENSION_IDENTIFIER) {
         chrome.runtime.sendMessage({ action: "minimize_window" });
     }
+
+    if (event.data.type === "HHH" &&
+        event.data.identifier === EXTENSION_IDENTIFIER) {
+        chrome.runtime.sendMessage({ type: "HHH" });
+    }
 });
+
+// window.addEventListener("message1", (event) => {
+//
+//     if (event.data.type === "HHH" &&
+//         event.data.identifier === EXTENSION_IDENTIFIER) {
+//         chrome.runtime.sendMessage({ type: "HHH" });
+//         console.log("여기 진입")
+//     }
+// });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "TABS_DATA_RESPONSE" &&
@@ -57,4 +71,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             data: message.data
         }, "*");
     }
+
+    if (message.type === "HHH" &&
+        message.source === EXTENSION_IDENTIFIER) {
+        console.log("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ====",message)
+        window.postMessage({
+            type: "HHH",
+            source: EXTENSION_IDENTIFIER,
+            data: message
+        }, "*");
+    }
 });
+
+// chrome.runtime.onMessage.addListener((message1, sender, sendResponse) => {
+//
+//     if (message.type === "HHH" &&
+//         message.source === EXTENSION_IDENTIFIER) {
+//         console.log("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ====",message1)
+//         window.postMessage({
+//             type: "HHH",
+//             source: EXTENSION_IDENTIFIER,
+//             data: message
+//         }, "*");
+//     }
+// });
