@@ -4,10 +4,7 @@ import Example from "./sidebar"; // 사이드바 컴포넌트를 가져옵니다
 import {Box} from '@mui/material';
 import {Route, Routes, useLocation} from "react-router-dom";
 import GambleView from "./view/GambleView";
-import Test from "./view/Test";
 import Dashboard from "./view/Dashboard";
-import Test2 from "./view/Test2";
-import Test3 from "./view/Test3";
 import ImageBoard from "./view/ImageList";
 import TextView from "./view/TextView";
 
@@ -49,9 +46,6 @@ function App() {
             <Route path="/board" element={<ImageBoard/>}/>
             <Route path="/text" element={<TextView/>}/>
             <Route path="/a" element={<GambleView/>}/>
-            <Route path="/test" element={<Test/>}/>
-            <Route path="/test2" element={<Test2/>}/>
-            <Route path="/test3" element={<Test3/>}/>
           </Routes>
         </Box>
         {/* Same as */}
