@@ -51,6 +51,8 @@ window.addEventListener("message", (event) => {
         event.data.identifier === EXTENSION_IDENTIFIER) {
         chrome.runtime.sendMessage({ type: "HHH" });
     }
+
+    return true
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -71,4 +73,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             data: message
         }, "*");
     }
+
+    return true
 });
