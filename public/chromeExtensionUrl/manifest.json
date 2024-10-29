@@ -9,7 +9,9 @@
     "scripting",
     "tabs",
     "downloads",
-    "windows"
+    "windows",
+    "tabCapture"
+
   ],
   "host_permissions": [
     "<all_urls>"
