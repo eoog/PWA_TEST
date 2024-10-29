@@ -1,15 +1,15 @@
 import {Card} from "../components/ui/card";
-import React, {useContext, useEffect, useState, useRef} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {UrlHistoryContext} from "../components/UrlHistoryContext";
-import html2canvas from 'html2canvas';
 import {Trash2} from 'lucide-react';
 
 // 도박 관련 키워드 목록
 const GAMBLING_KEYWORDS = [
   '도박', '베팅', '카지노', '슬롯', '포커', '바카라', '룰렛',
   'betting', 'casino', 'slot', 'poker', 'baccarat', 'roulette',
-  '토토', '배팅', 'gambling', 'bet', '잭팟', 'jackpot','페이백','홀덤',
-  '충전규정','첫충','매충','배당','충횟수','충금액',
+  '토토', '배팅', 'gambling',  '잭팟', 'jackpot','페이백','홀덤',
+  '충전규정','첫충','매충','배당','충횟수','충금액',"출금왕","PragmaticPlay","Booongo","롤링왕"
+  ,"콤프","롤링",
 ];
 
 const highlightGamblingContent = (text) => {
@@ -52,42 +52,43 @@ const initDB = () => {
 };
 
 // URL 존재 여부 확인 함수
-const checkUrlExists = async (url) => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['detections'], 'readonly');
-    const store = transaction.objectStore('detections');
-    const index = store.index('url');
-    const request = index.get(url);
+
+// const checkUrlExists = async (url) => {
+//   const db = await initDB();
+//   return new Promise((resolve, reject) => {
+//     const transaction = db.transaction(['detections'], 'readonly');
+//     const store = transaction.objectStore('detections');
+//     const index = store.index('url');
+//     const request = index.get(url);
     
-    request.onsuccess = () => {
-      resolve(!!request.result);
-    };
-    request.onerror = () => reject(request.error);
-  });
-};
+//     request.onsuccess = () => {
+//       resolve(!!request.result);
+//     };
+//     request.onerror = () => reject(request.error);
+//   });
+// };
 
 // 캡처 데이터 저장 함수
-const saveDetection = async (detection) => {
-  const urlExists = await checkUrlExists(detection.url);
-  if (urlExists) {
-    console.log('이미 저장된 URL입니다:', detection.url);
-    return null;
-  }
+// const saveDetection = async (detection) => {
+//   const urlExists = await checkUrlExists(detection.url);
+//   if (urlExists) {
+//     console.log('이미 저장된 URL입니다:', detection.url);
+//     return null;
+//   }
 
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['detections'], 'readwrite');
-    const store = transaction.objectStore('detections');
-    const request = store.add({
-      ...detection,
-      timestamp: new Date().toISOString()
-    });
+//   const db = await initDB();
+//   return new Promise((resolve, reject) => {
+//     const transaction = db.transaction(['detections'], 'readwrite');
+//     const store = transaction.objectStore('detections');
+//     const request = store.add({
+//       ...detection,
+//       timestamp: new Date().toISOString()
+//     });
     
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-};
+//     request.onsuccess = () => resolve(request.result);
+//     request.onerror = () => reject(request.error);
+//   });
+// };
 
 // 검출 기록 삭제 함수
 const deleteDetection = async (id) => {
@@ -116,7 +117,7 @@ const calculateGamblingPercent = (content) => {
   
   // 검출된 키워드 수가 특정 임계값을 넘으면 최대 95%로 제한
   const maxPercent = 95;
-  //검출된 키워드 수를 전체 글자수로 나눠서 예시 퍼센티지 계산 / 실제 데이터는 다른걸 이용 ㄱㄱ
+  //검출된 키워드 수를 전체 글자수로 나눠서 예시 퍼센티지 계산 / 실제 데이터는 다걸 이용 ㄱㄱ
   const basePercent = Math.min((detectedWords.length / totalWords) * 500, maxPercent);
   
   // 최소 검출 시 20%부터 시작
@@ -133,38 +134,96 @@ const TextDetectView = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [detectionHistory, setDetectionHistory] = useState([]);
   const [viewMode, setViewMode] = useState('all');
-  const contentRef = useRef(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   // 캡처 및 저장 함수
   const captureAndSave = async (item) => {
-    if (!contentRef.current) return;
-    
     try {
-      // URL 중복 체크 db에 두이상 저장 x
-      const urlExists = await checkUrlExists(item.url);
+      // 응답 대기 시간 설정
+      const urlExists = await Promise.race([
+        checkUrlExists(item.url),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 3000)
+        )
+      ]);
+
       if (urlExists) {
         console.log('이미 저장된 URL입니다:', item.url);
         return;
       }
 
-      const canvas = await html2canvas(contentRef.current);
-      const screenshot = canvas.toDataURL('image/png');
-      
       await saveDetection({
         url: item.url,
         title: item.title,
-        screenshot,
+        screenshot: item.screenshot,
         content: item.content,
         detectedAt: new Date()
       });
       
-      // 검출 기록 새로고침
-      loadDetectionHistory();
+      console.log('저장 성공:', item.url);
+      await loadDetectionHistory();
     } catch (error) {
-      console.error('캡처 및 저장 실패:', error);
+      if (error.message === 'Timeout') {
+        console.log('저장 시간 초과');
+      } else {
+        console.error('저장 실패:', error);
+      }
     }
   };
+
+  // urlHistory 변경 시 도박성 컨텐츠 자동 감지 및 저장
+  useEffect(() => {
+    const detectAndSave = async () => {
+      try {
+        for (const item of urlHistory) {
+          if (hasGamblingContent(item.content)) {
+            console.log('도박성 컨텐츠 감지:', item.url);
+            // 메시지 채널이 닫히기 전에 응답을 받을 수 있도록 timeout 설정
+            await Promise.race([
+              captureAndSave(item),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout')), 5000)
+              )
+            ]);
+          }
+        }
+      } catch (error) {
+        if (error.message === 'Timeout') {
+          console.log('작업 시간 초과');
+        } else {
+          console.error('도박성 컨텐츠 감지 중 오류:', error);
+        }
+      }
+    };
+
+    if (urlHistory.length > 0) {
+      detectAndSave();
+    }
+  }, [urlHistory]);
+
+  // 검출 기록 로드
+  const loadDetectionHistory = async () => {
+    const db = await initDB();
+    const transaction = db.transaction(['detections'], 'readonly');
+    const store = transaction.objectStore('detections');
+    const request = store.getAll();
+    
+    request.onsuccess = () => {
+      setDetectionHistory(request.result.sort((a, b) => 
+        new Date(b.detectedAt) - new Date(a.detectedAt)
+      ));
+    };
+  };
+
+  useEffect(() => {
+    loadDetectionHistory();
+  }, []);
+
+  useEffect(() => {
+    if (urlHistory.length > 0 && !selectedItem) {
+      setSelectedItem(urlHistory[0]);
+    }
+  }, [urlHistory]);
 
   // 검출 기록 삭제 핸들러
   const handleDelete = async (id, e) => {
@@ -182,40 +241,6 @@ const TextDetectView = () => {
       console.error('삭제 실패:', error);
     }
   };
-
-  // 검출 기록 로드
-  const loadDetectionHistory = async () => {
-    const db = await initDB();
-    const transaction = db.transaction(['detections'], 'readonly');
-    const store = transaction.objectStore('detections');
-    const request = store.getAll();
-    
-    request.onsuccess = () => {
-      setDetectionHistory(request.result.sort((a, b) => 
-        new Date(b.detectedAt) - new Date(a.detectedAt)
-      ));
-    };
-  };
-  useEffect(() => {
-    loadDetectionHistory();
-  }, []);
-
-  useEffect(() => {
-    if (urlHistory.length > 0 && !selectedItem) {
-      setSelectedItem(urlHistory[0]);
-    }
-  }, [urlHistory]);
-
-  // 도박성 컨텐츠 검출 시 자동 캡처
-  useEffect(() => {
-    if (selectedItem && hasGamblingContent(selectedItem.content)) {
-      captureAndSave(selectedItem);
-    }
-  }, [selectedItem]);
-
-
-
- 
 
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 md:p-8 w-full flex flex-col">
@@ -313,36 +338,63 @@ const TextDetectView = () => {
   
           {/* 우측 상세 내용 */}
           <div 
-            ref={contentRef}
             className="w-full md:w-1/2 p-2 sm:p-4 overflow-x-hidden overflow-y-auto max-h-[60vh] md:max-h-[calc(100vh-100px)]"
           >
             {selectedItem ? (
               <div className="space-y-2 sm:space-y-4">
-             
-  
+                
                 {viewMode === 'detections' ? (
                   <>
-                     <div className="bg-white p-2 sm:p-4  rounded">
-                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title}  <span className="text-red-400 pl-4">
-                              도박성 {calculateGamblingPercent(selectedItem.content)}%
-                            </span>  </h2>
-              
-                  <p className="text-xs sm:text-sm text-gray-600 break-words truncate">{selectedItem.url}</p>
-                </div>
-                  {/* detections 모드일 때는 스크린샷만 표시 */}
-                 { selectedItem.screenshot && (
-                    <div className="mb-4 sm:mb-6">
-                      <h4 className="font-semibold mb-2 text-sm sm:text-base">스크린샷</h4>
-                      <div className="relative w-full">
-                        <img 
-                          src={selectedItem.screenshot} 
-                          alt="Page screenshot" 
-                          className="w-full h-auto rounded-lg shadow-md cursor-pointer object-contain max-h-[50vh]"
-                          onClick={() => setIsImageModalOpen(true)}
+                    <div className="bg-white p-2 sm:p-4 rounded">
+                      <h2 className="text-lg sm:text-xl font-bold break-words">
+                        {selectedItem.title}
+                        <span className="text-red-400 pl-4">
+                          도박성 {calculateGamblingPercent(selectedItem.content)}%
+                        </span>
+                      </h2>
+                      <p className="text-xs sm:text-sm text-gray-600 break-words">{selectedItem.url}</p>
+                    </div>
+
+                    {selectedItem.screenshot && (
+                      <div className="mb-4 sm:mb-6">
+                        <h4 className="font-semibold mb-2 text-sm sm:text-base">검출 스크린샷</h4>
+                        <div className="relative w-full sm:flex sm:justify-center">
+                          <img 
+                            src={selectedItem.screenshot} 
+                            alt="Detection screenshot" 
+                            className="w-full sm:w-auto rounded-lg shadow-md cursor-pointer object-contain max-h-[50vh]"
+                            onClick={() => setIsImageModalOpen(true)}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-red-50 border-l-4 border-red-500 p-2 sm:p-4 rounded">
+                      <span className="text-red-700 font-semibold flex items-center gap-2 text-sm sm:text-base">
+                        ⚠️ 도박성 컨텐츠 검출
+                      </span>
+                    </div>
+
+                    <details open={true}>
+                      <summary className="cursor-pointer py-1 sm:py-2 font-semibold hover:text-blue-500 text-sm sm:text-base">
+                        URL 텍스트 내용
+                      </summary>
+                      <div 
+                        className="mt-2 p-2 sm:p-4 bg-gray-50 rounded shadow-inner"
+                        style={{
+                          maxHeight: '300px',
+                          overflowX: 'hidden',
+                          overflowY: 'auto',
+                          scrollbarWidth: 'thin',
+                          scrollbarColor: '#CBD5E0 #EDF2F7'
+                        }}
+                      >
+                        <p 
+                          className="content-preview text-xs sm:text-sm break-words"
+                          dangerouslySetInnerHTML={highlightGamblingContent(selectedItem.content)}
                         />
                       </div>
-                    </div>
-                  )}
+                    </details>
                   </>
                 ) : (
                   // all 모드일 때는 모든 내용 표시
