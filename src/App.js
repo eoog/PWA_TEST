@@ -10,6 +10,7 @@ import ImageBoard from "./view/ImageList";
 import InstallGuide from "./view/installGuide";
 import DemoInstallGuide from "./view/DemoInstallGuide";
 import TextView from "./view/TextView";
+import TextDetectView from "./view/TextdetectResult";
 
 async function requestNotificationPermission() {
   try {
@@ -43,11 +44,14 @@ function App() {
       <ExtensionProvider>
         <Box sx={{
           display: 'flex',
-          height: '100vh'
+          height: '100vh',
+          overflow: 'hidden'
         }}>
           <MenuSidebar />
           <Routes>
             <Route path="/demo-install-guide" element={<DemoInstallGuide />} />
+            <Route path="/text-result" element={<TextDetectView/>} />
+
             <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
