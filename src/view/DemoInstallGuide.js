@@ -45,6 +45,26 @@ const DemoInstallGuide = () => {
         window.location.reload();
     };
 
+    const handleImageClick = (image, title) => {
+        Swal.fire({
+            imageUrl: image,
+            imageAlt: title,
+            title: title,
+            width: '80%',
+            padding: '1em',
+            showConfirmButton: false,
+            showCloseButton: true,
+            backdrop: `
+                rgba(0,0,0,0.8)
+                center
+                no-repeat
+            `,
+            customClass: {
+                image: 'max-h-[80vh] object-contain'
+            }
+        });
+    };
+
     const checkInstalled = async () => {
         try {
             const installed = await checkExtensionInstalled();
@@ -154,7 +174,8 @@ const DemoInstallGuide = () => {
                                         <div className="space-y-6">
                                             <div className="space-y-4">
                                                 <div className="flex items-start gap-4">
-                                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-lg">
+                                                    <div
+                                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-bold text-lg">
                                                         {index + 1}
                                                     </div>
                                                     <div>
@@ -189,12 +210,27 @@ const DemoInstallGuide = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="lg:pl-8">
-                                            <img
-                                                src={step.image}
-                                                alt={step.imageAlt}
-                                                className="rounded-lg shadow-md w-full object-cover"
-                                            />
+                                        <div className="lg:pl-8 relative group">
+                                            <div
+                                                className="relative cursor-pointer transition-transform hover:scale-[1.02]"
+                                                onClick={() => handleImageClick(step.image, step.imageAlt)}
+                                            >
+                                                <img
+                                                    src={step.image}
+                                                    alt={step.imageAlt}
+                                                    className="rounded-lg shadow-md w-full object-cover"
+                                                />
+                                                <div
+                                                    className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg flex items-center justify-center">
+                                                    <div
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white p-2 rounded-full shadow-lg">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="absolute bottom-2 right-2 text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
+                                                클릭하여 확대
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
