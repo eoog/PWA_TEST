@@ -11,7 +11,7 @@ export const UrlHistoryProvider = ({ children }) => {
   const [lastReceivedMessage, setLastReceivedMessage] = useState(null);
   const [processedUrls] = useState(new Set());
 
-  // 확장프로그램과 통신
+ 
   // 데이터 요청 함수
   const requestUrlsAndContent = () => {
     window.postMessage(

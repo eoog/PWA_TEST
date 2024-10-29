@@ -51,44 +51,7 @@ const initDB = () => {
   });
 };
 
-// URL 존재 여부 확인 함수
 
-// const checkUrlExists = async (url) => {
-//   const db = await initDB();
-//   return new Promise((resolve, reject) => {
-//     const transaction = db.transaction(['detections'], 'readonly');
-//     const store = transaction.objectStore('detections');
-//     const index = store.index('url');
-//     const request = index.get(url);
-    
-//     request.onsuccess = () => {
-//       resolve(!!request.result);
-//     };
-//     request.onerror = () => reject(request.error);
-//   });
-// };
-
-// 캡처 데이터 저장 함수
-// const saveDetection = async (detection) => {
-//   const urlExists = await checkUrlExists(detection.url);
-//   if (urlExists) {
-//     console.log('이미 저장된 URL입니다:', detection.url);
-//     return null;
-//   }
-
-//   const db = await initDB();
-//   return new Promise((resolve, reject) => {
-//     const transaction = db.transaction(['detections'], 'readwrite');
-//     const store = transaction.objectStore('detections');
-//     const request = store.add({
-//       ...detection,
-//       timestamp: new Date().toISOString()
-//     });
-    
-//     request.onsuccess = () => resolve(request.result);
-//     request.onerror = () => reject(request.error);
-//   });
-// };
 
 // 검출 기록 삭제 함수
 const deleteDetection = async (id) => {
@@ -342,7 +305,7 @@ const TextDetectView = () => {
           >
             {selectedItem ? (
               <div className="space-y-2 sm:space-y-4">
-                
+
                 {viewMode === 'detections' ? (
                   <>
                     <div className="bg-white p-2 sm:p-4 rounded">
