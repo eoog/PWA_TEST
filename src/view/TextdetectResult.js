@@ -102,6 +102,32 @@ const deleteDetection = async (id) => {
   });
 };
 
+// 도박 관련 키워드 검출 및 퍼센트 계산 함수(예시 )
+const calculateGamblingPercent = (content) => {
+
+
+  // 텍스트에서 도박 키워드 > detectedWords 배열에 저장
+  const detectedWords = content.split(/\s+/).filter(word => 
+    GAMBLING_KEYWORDS.some(keyword => word.toLowerCase().includes(keyword.toLowerCase()))
+  );
+
+  // 전체 단어 수 
+  const totalWords = content.split(/\s+/).length;
+  
+  // 검출된 키워드 수가 특정 임계값을 넘으면 최대 95%로 제한
+  const maxPercent = 95;
+  //검출된 키워드 수를 전체 글자수로 나눠서 예시 퍼센티지 계산 / 실제 데이터는 다른걸 이용 ㄱㄱ
+  const basePercent = Math.min((detectedWords.length / totalWords) * 500, maxPercent);
+  
+  // 최소 검출 시 20%부터 시작
+  const minPercent = 20;
+  
+  // 검출된 키워드가 있을 경우 최소 20%부터 시작하여 계산
+  return detectedWords.length > 0 
+    ? Math.max(Math.round(basePercent), minPercent)
+    : 0;
+};
+
 const TextDetectView = () => {
   const urlHistory = useContext(UrlHistoryContext);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -189,8 +215,7 @@ const TextDetectView = () => {
 
 
 
-  // 검출텍스트 갯수 input 넣어서 83 % 나오게 도출
-
+ 
 
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4 md:p-8 w-full flex flex-col">
@@ -263,7 +288,12 @@ const TextDetectView = () => {
                         <h4 className="font-semibold text-sm sm:text-base">{detection.title || 'No Title'}</h4>
                         <p className="text-xs sm:text-sm text-gray-600 truncate">URL: {detection.url}</p>
                         <p className="text-xs text-gray-500 mt-1">
-                          검출 시각: {new Date(detection.detectedAt).toLocaleString()} <span className="text-red-400 pl-4">도박성 83%</span>
+                          검출 시각: {new Date(detection.detectedAt).toLocaleString()} 
+                          {calculateGamblingPercent(detection.content) > 0 && (
+                            <span className="text-red-400 pl-4">
+                              도박성 {calculateGamblingPercent(detection.content)}%
+                            </span>
+                          )}
                         </p>
                       </div>
                       <button
@@ -288,14 +318,17 @@ const TextDetectView = () => {
           >
             {selectedItem ? (
               <div className="space-y-2 sm:space-y-4">
-                <div className="bg-white p-2 sm:p-4 rounded">
-                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title} <span className="text-red-400 text-md pl-4">도박성 83%</span></h2> 
-                  <p className="text-xs sm:text-sm text-gray-600 break-words">{selectedItem.url}</p>
-                </div>
+             
   
                 {viewMode === 'detections' ? (
-                  // detections 모드일 때는 스크린샷만 표시
-                  selectedItem.screenshot && (
+                  <>
+                     <div className="bg-white p-2 sm:p-4  rounded">
+                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title} <span className="text-red-400 text-md pl-4">도박성 83%</span>  </h2>
+              
+                  <p className="text-xs sm:text-sm text-gray-600 break-words truncate">{selectedItem.url}</p>
+                </div>
+                  {/* detections 모드일 때는 스크린샷만 표시 */}
+                 { selectedItem.screenshot && (
                     <div className="mb-4 sm:mb-6">
                       <h4 className="font-semibold mb-2 text-sm sm:text-base">스크린샷</h4>
                       <div className="relative w-full">
@@ -307,11 +340,18 @@ const TextDetectView = () => {
                         />
                       </div>
                     </div>
-                  )
+                  )}
+                  </>
                 ) : (
                   // all 모드일 때는 모든 내용 표시
                   <>
+                     <div className="bg-white p-2 sm:p-4 rounded">
+                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title} </h2>
+                  {/* <span className="text-red-400 text-md pl-4">도박성 83%</span>  */}
+                  <p className="text-xs sm:text-sm text-gray-600 break-words">{selectedItem.url}</p>
+                </div>
                     {selectedItem.screenshot && (
+                      
                       <div className="mb-4 sm:mb-6">
                         <h4 className="font-semibold mb-2 text-sm sm:text-base">스크린샷</h4>
                         <div className="relative w-full">
