@@ -323,7 +323,9 @@ const TextDetectView = () => {
                 {viewMode === 'detections' ? (
                   <>
                      <div className="bg-white p-2 sm:p-4  rounded">
-                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title} <span className="text-red-400 text-md pl-4">도박성 83%</span>  </h2>
+                  <h2 className="text-lg sm:text-xl font-bold break-words">{selectedItem.title}  <span className="text-red-400 pl-4">
+                              도박성 {calculateGamblingPercent(selectedItem.content)}%
+                            </span>  </h2>
               
                   <p className="text-xs sm:text-sm text-gray-600 break-words truncate">{selectedItem.url}</p>
                 </div>
