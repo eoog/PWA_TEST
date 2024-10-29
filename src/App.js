@@ -8,7 +8,7 @@ import MenuSidebar from "./menuSidebar";
 import Dashboard from "./view/Dashboard";
 import ImageBoard from "./view/ImageList";
 import InstallGuide from "./view/installGuide";
-import DemoInstallGuide from "./components/DemoInstallGuide";
+import DemoInstallGuide from "./view/DemoInstallGuide";
 import TextView from "./view/TextView";
 import TextDetectView from "./view/TextdetectResult";
 
