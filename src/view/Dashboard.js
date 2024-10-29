@@ -31,7 +31,7 @@ const Dashboard = () => {
   const renderVideoContent = () => {
     if (!stream) {
       return (
-          <div onClick={() => window.location.reload()} className="flex flex-col items-center justify-center h-[50vh] text-neutral-500">
+          <div onClick={() => startScreenShare()} className="flex flex-col items-center justify-center h-[50vh] text-neutral-500">
             <img
                 className="w-24 h-24 mb-4"
                 src={require('../meer.ico')}

@@ -19,7 +19,7 @@ function ScreenCapture({ setCapturedFile }) {
 
   useEffect(() => {
     if (!stream) {
-      startScreenShare();
+      //startScreenShare();
     } else if (videoRef.current) {
       videoRef.current.srcObject = stream;
       StartStream();

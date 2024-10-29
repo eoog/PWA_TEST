@@ -4,12 +4,13 @@ import {UrlHistoryContext} from "../components/UrlHistoryContext";
 
 
 const TextView = () => {
-    console.log('TextView');
   const urlHistory = useContext(UrlHistoryContext);
 
-  useEffect(() => {
-    console.log("결과값 == " , urlHistory[0])
-  }, [urlHistory]);
+  // useEffect(() => {
+  //   console.log("결과값 == " , urlHistory[0])
+  // }, [urlHistory]);
+
+
   return (
       <>
         <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col">
@@ -22,6 +23,7 @@ const TextView = () => {
                 margin: 'auto',
               }}
           >
+
             <ul>
               {urlHistory.map((item, index) => (
                   <li key={index} className="url-history-item">
@@ -39,6 +41,7 @@ const TextView = () => {
                   </li>
               ))}
             </ul>
+
           </Card>
         </div>
       </>

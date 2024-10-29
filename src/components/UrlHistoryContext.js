@@ -8,12 +8,11 @@ const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 export const UrlHistoryProvider = ({ children }) => {
   const [urlHistory, setUrlHistory] = useState([]);
   const [isPaused, setIsPaused] = useState(false); // 요청 일시 중지 상태
+  const [lastReceivedMessage, setLastReceivedMessage] = useState(null); // 마지막 수신된 메시지 저장
 
   // 확장프로그램과 통신
   // 데이터 요청 함수
   const requestUrlsAndContent = () => {
-    // console.log("URL과 콘텐츠를 요청합니다...");
-    if (isPaused) return; // 요청이 일시 중지 상태면 리턴
     window.postMessage(
         {
           type: "HHH",
@@ -27,20 +26,22 @@ export const UrlHistoryProvider = ({ children }) => {
   // 메시지 리스너 설정
   useEffect(() => {
     const messageListener = (event) => {
-      // console.log("Received message:", event.data);
       if (
           event.data.type === "HHH" &&
           event.data.source === EXTENSION_IDENTIFIER
       ) {
-        const title = event.data.data.data[0]?.title; // 안전하게 접근
-
+        const currentData = event.data.data.data;
+        const title = currentData[0]?.title; // 안전하게 접근
+      
         // PWA 제목일 경우 요청 일시 중지
         if (title === "PWA") {
           setIsPaused(true);
         } else {
           setIsPaused(false); // PWA가 아닐 경우 요청 재개
-          setUrlHistory(event.data.data.data); // URL 히스토리 업데이트
+          setUrlHistory(currentData); // URL 히스토리 업데이트
         }
+
+
       }
     };
 
@@ -58,9 +59,7 @@ export const UrlHistoryProvider = ({ children }) => {
       clearInterval(intervalId);
       window.removeEventListener("message", messageListener);
     };
-
-    
-  }, []); // isPaused 상태를 의존성으로 추가
+  }, [isPaused, lastReceivedMessage]); // isPaused와 lastReceivedMessage를 의존성으로 추가
 
   return (
       <UrlHistoryContext.Provider value={urlHistory}>
