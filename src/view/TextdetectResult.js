@@ -2,6 +2,7 @@ import {Card} from "../components/ui/card";
 import React, {useContext, useEffect, useState} from "react";
 import {UrlHistoryContext} from "../components/UrlHistoryContext";
 import {Trash2} from 'lucide-react';
+import ScreenShareContext from "../components/ScreenShareProvider";
 
 // 도박 관련 키워드 목록
 const GAMBLING_KEYWORDS = [
@@ -98,6 +99,7 @@ const TextDetectView = () => {
   const [detectionHistory, setDetectionHistory] = useState([]);
   const [viewMode, setViewMode] = useState('all');
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
 
   // 캡처 및 저장 함수
   const captureAndSave = async (item) => {
@@ -133,6 +135,13 @@ const TextDetectView = () => {
       }
     }
   };
+
+  // 선정성
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream, videoRef]);
 
   // urlHistory 변경 시 도박성 컨텐츠 자동 감지 및 저장
   useEffect(() => {
@@ -434,6 +443,9 @@ const TextDetectView = () => {
           </div>
         </div>
       </Card>
+      {/*선정성 비디오 삭제 금지*/}
+      <video ref={videoRef} hidden={true} autoPlay playsInline
+             style={{width: '10%', height: 'auto'}}/>
     </div>
   )
 };

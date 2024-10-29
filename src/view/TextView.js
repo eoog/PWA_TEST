@@ -1,14 +1,19 @@
 import {Card} from "../components/ui/card";
 import React, {useContext, useEffect} from "react";
 import {UrlHistoryContext} from "../components/UrlHistoryContext";
+import ScreenShareContext from "../components/ScreenShareProvider";
 
 
 const TextView = () => {
   const urlHistory = useContext(UrlHistoryContext);
-
-  // useEffect(() => {
-  //   console.log("결과값 == " , urlHistory[0])
-  // }, [urlHistory]);
+  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
+  
+  // 선정성
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream, videoRef]);
 
 
   return (
@@ -44,6 +49,9 @@ const TextView = () => {
 
           </Card>
         </div>
+        {/*선정성 비디오 삭제 금지*/}
+        <video ref={videoRef} hidden={true} autoPlay playsInline
+               style={{width: '10%', height: 'auto'}}/>
       </>
   )
 }
