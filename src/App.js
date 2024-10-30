@@ -49,9 +49,14 @@ function App() {
         }}>
           <MenuSidebar />
           <Routes>
-            <Route path="/demo-install-guide" element={<DemoInstallGuide />} />
-            <Route path="/text-result" element={<TextDetectView/>} />
-
+            <Route path="/demo-install-guide" element={
+              <DemoInstallGuide />}
+            />
+            <Route path="/text-result" element={
+              <ProtectedRoute>
+                <TextDetectView/>
+              </ProtectedRoute>
+            } />
             <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
