@@ -69,7 +69,6 @@ self.addEventListener('install', (event) => {
       caches.open('my-cache').then(cache => {
         return cache.addAll([
           '/index.html',
-          '/main.js',
           '/style.css',
           '/logo.png',
           '/nude.onnx'
