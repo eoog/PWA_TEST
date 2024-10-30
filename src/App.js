@@ -6,7 +6,7 @@ import { ExtensionProvider } from './contexts/ExtensionContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import MenuSidebar from "./menuSidebar";
 import Dashboard from "./view/Dashboard";
-import ImageBoard from "./view/ImageList";
+import ImageBoard from "./view/ImageBoard";
 import InstallGuide from "./view/installGuide";
 import DemoInstallGuide from "./view/DemoInstallGuide";
 import TextView from "./view/TextView";
