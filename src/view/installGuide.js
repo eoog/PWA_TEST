@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardContent } from "../components/ui/card";
+import { Card, CardHeader, CardContent } from "../components/common/Card";
 import catImage1 from '../images/cat1.jpg';
 import catImage2 from '../images/cat2.jpg';
 

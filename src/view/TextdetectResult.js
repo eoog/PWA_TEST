@@ -1,4 +1,4 @@
-import {Card} from "../components/ui/card";
+import {Card} from "../components/common/Card";
 import React, {useContext, useEffect, useState} from "react";
 import {UrlHistoryContext} from "../contexts/UrlHistoryContext";
 import { Trash2} from 'lucide-react';
