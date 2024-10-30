@@ -12,8 +12,7 @@ const Pro = () => {
 
   return (
       <>
-        <ScreenCapture setCapturedFile={setCapturedFile} stream={stream}
-                       setStream={setStream}/>
+        <ScreenCapture setCapturedFile={setCapturedFile} stream={stream} setStream={setStream}/>
         <YOLOv8ObjectDetection capturedFile={capturedFile}/>
       </>
   );

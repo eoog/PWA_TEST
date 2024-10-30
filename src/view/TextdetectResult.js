@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react';
 import ScreenShareContext from "../contexts/ScreenShareContext";
 import Swal from "sweetalert2";
 import {calculateGamblingPercent, hasGamblingContent, highlightGamblingContent} from "../utils/gamblingDetection";
-import {deleteDetection, initDB} from "../utils/indexedDB";
+import {deleteDetection, initDB} from "../utils/indexedDB/indexedDB";
 
 const TextDetectView = () => {
   const urlHistory = useContext(UrlHistoryContext);

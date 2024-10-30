@@ -3,8 +3,8 @@ import './App.css';
 import { Box } from '@mui/material';
 import { Route, Routes, useLocation } from "react-router-dom";
 import { ExtensionProvider } from './contexts/ExtensionContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import MenuSidebar from "./menuSidebar";
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import SidebarMenu from "./components/common/SidebarMenu";
 import Dashboard from "./view/Dashboard";
 import ImageBoard from "./view/ImageBoard";
 import InstallGuide from "./view/installGuide";
@@ -47,7 +47,7 @@ function App() {
           height: '100vh',
           overflow: 'hidden'
         }}>
-          <MenuSidebar />
+          <SidebarMenu />
           <Routes>
             <Route path="/demo-install-guide" element={
               <DemoInstallGuide />}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { checkExtensionInstalled } from '../components/extensionCheck';
+import { checkExtensionInstalled } from '../utils/extensionCheck';
 
 const ExtensionContext = createContext(null);
 

@@ -8,7 +8,7 @@ import {
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Link, useLocation } from "react-router-dom";
 
-export default function MenuSidebar() {
+export default function SidebarMenu() {
   const { collapseSidebar, collapsed } = useProSidebar();
   const location = useLocation(); // 현재 경로를 가져오기
 
@@ -48,7 +48,7 @@ export default function MenuSidebar() {
                           bgcolor: "#fffff",
                         }}
                     >
-                      <img src={require('./meer.ico')} />
+                      <img src={require('../../meer.ico')} />
                     </Box>
                     <Box
                         sx={{

@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useExtension } from '../contexts/ExtensionContext';
+import { useExtension } from '../../contexts/ExtensionContext';
 
 export const ProtectedRoute = ({ children }) => {
     const { isExtensionInstalled, isChecking } = useExtension();

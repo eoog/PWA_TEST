@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from "../components/common/Card";
-import { checkExtensionInstalled } from "../components/extensionCheck";
+import { checkExtensionInstalled } from "../utils/extensionCheck";
 import Swal from "sweetalert2";
 
 const EXTENSION_CONFIG = {
