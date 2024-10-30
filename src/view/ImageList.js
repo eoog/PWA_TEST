@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from "react";
 import ScreenShareContext from "../contexts/ScreenShareContext";
 import DetectionModal from "../components/DetectionModal";
-import {Card} from "../components/ui/card";
+import {Card} from "../components/common/Card";
 
 const ImageBoard = () => {
   const [images, setImages] = useState([]); // IndexedDB에서 불러온 이미지 리스트
