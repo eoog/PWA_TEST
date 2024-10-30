@@ -1,5 +1,6 @@
 // UrlHistoryContext.js
 import React, { createContext, useState, useEffect } from 'react';
+import changeDataForm from "../utils/changeDataForm";
 
 export const UrlHistoryContext = createContext();
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
@@ -125,49 +126,48 @@ export const UrlHistoryProvider = ({ children }) => {
         event.data.type === "HHH" &&
         event.data.source === EXTENSION_IDENTIFIER
       ) {
-        const currentData = event.data.data.data;
-        const title = currentData[0]?.title;
-      
-        if (title === "PWA") {
-          setIsPaused(true);
-        } else {
-          setIsPaused(false);
-          setUrlHistory(currentData);
-          
-          const currentUrl = currentData[0]?.url;
-          if (!currentUrl || processedUrls.has(currentUrl)) {
-            return;
-          }
+        const currentData = changeDataForm(event.data.data.data);
 
-          const content = currentData[0]?.content;
-          
-          if (content && highlightGamblingContent(content).__html.includes('color: red')) {
-            try {
-              const urlExists = await checkUrlExists(currentUrl);
-              if (!urlExists) {
-                // 저장
-                await saveDetection({
-                  url: currentData[0].url,
-                  title: currentData[0].title,
-                  screenshot: currentData[0].screenshot,
-                  content: currentData[0].content,
-                  detectedAt: new Date()
-                });
-                
-                console.log('도박성 컨텐츠 저장 성공:', currentUrl);
-                
-                // 저장 성공 후 바로 알림 표시
-                showNotification();
-              } else {
-                console.log('이미 저장된 URL입니다:', currentUrl);
-              }
-            } catch (error) {
-              console.error('저장 실패:', error);
-            }
-          }
+        if (currentData[0]?.title === "PWA") setIsPaused(true);
 
-          processedUrls.add(currentUrl);
+        setIsPaused(false);
+
+        const currentUrl = currentData[0]?.url;
+        if (!currentUrl || processedUrls.has(currentUrl)) {
+          return;
         }
+
+        const content = currentData[0]?.content;
+
+
+        if (content && highlightGamblingContent(content).__html.includes('color: red')) {
+          try {
+            const urlExists = await checkUrlExists(currentUrl);
+            if (!urlExists) {
+              // 저장
+              await saveDetection({
+                url: currentData[0].url,
+                title: currentData[0].title,
+                screenshot: currentData[0].screenshot,
+                content: currentData[0].content,
+                detectedAt: new Date()
+              });
+
+              currentData[0].검출유무 = 1;
+              console.log('도박성 컨텐츠 저장 성공:', currentUrl);
+
+              showNotification();
+            } else {
+              console.log('이미 저장된 URL입니다:', currentUrl);
+            }
+          } catch (error) {
+            console.error('저장 실패:', error);
+          }
+        }
+
+        console.log(currentData[0]);
+        processedUrls.add(currentUrl);
+        setUrlHistory(currentData);
       }
     };
 
