@@ -1,8 +1,11 @@
 import {Card} from "../components/ui/card";
 import React, {useContext, useEffect, useState} from "react";
 import {UrlHistoryContext} from "../contexts/UrlHistoryContext";
-import {Trash2} from 'lucide-react';
+import { Trash2} from 'lucide-react';
 import ScreenShareContext from "../contexts/ScreenShareContext";
+
+
+
 
 // 도박 관련 키워드 목록
 const GAMBLING_KEYWORDS = [
@@ -67,7 +70,7 @@ const deleteDetection = async (id) => {
   });
 };
 
-// 도박 관련 키워드 검출 및 퍼센트 계산 함수(예시 )
+// 도박 관련 키워드 검출 및 퍼센트 계산 함수
 const calculateGamblingPercent = (content) => {
 
 
@@ -99,7 +102,15 @@ const TextDetectView = () => {
   const [detectionHistory, setDetectionHistory] = useState([]);
   const [viewMode, setViewMode] = useState('all');
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
+  const { stream, videoRef } = useContext(ScreenShareContext);
+
+  // urlHistory가 변경될 때마다 자동선택
+  useEffect(() => {
+    if (urlHistory.length > 0&&viewMode==='all') {
+      setSelectedItem(urlHistory[urlHistory.length - 1]);
+    }
+  }, [urlHistory,viewMode]); 
+
 
   // 캡처 및 저장 함수
   const captureAndSave = async (item) => {
@@ -187,14 +198,13 @@ const TextDetectView = () => {
     };
   };
 
-  useEffect(() => {
-    loadDetectionHistory();
-  }, []);
+
 
   useEffect(() => {
     if (urlHistory.length > 0 && !selectedItem) {
       setSelectedItem(urlHistory[0]);
     }
+    loadDetectionHistory();
   }, [urlHistory]);
 
   // 검출 기록 삭제 핸들러
@@ -239,8 +249,9 @@ const TextDetectView = () => {
                     : 'bg-gray-200 hover:bg-gray-300'
                 }`}
               >
-                도박성 검출 ({detectionHistory.length})
+                도박성 검출 ({detectionHistory.length}) 
               </button>
+              {/* <button className="pl-10" onClick={()=>loadDetectionHistory()}><LucideRefreshCw className="w-4 h-4 sm:w-5 sm:h-5"/></button> */}
             </div>
   
             <div className="overflow-y-auto overflow-x-hidden max-h-[40vh] md:max-h-[calc(100vh-200px)] space-y-2">
