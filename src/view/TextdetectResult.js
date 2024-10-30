@@ -104,13 +104,23 @@ const TextDetectView = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { stream, videoRef } = useContext(ScreenShareContext);
 
-  // urlHistory가 변경될 때마다 자동선택
+  // 렌더링 시 
   useEffect(() => {
     if (urlHistory.length > 0&&viewMode==='all') {
       setSelectedItem(urlHistory[urlHistory.length - 1]);
     }
-  }, [urlHistory,viewMode]); 
+  }, [urlHistory]); 
 
+
+  // viewMode가 변경될 때마다 selectedItem 업데이트
+  useEffect(()=>{
+    if(viewMode==='detections'){
+    setSelectedItem(detectionHistory[0])
+    }
+    else{
+      setSelectedItem(urlHistory[urlHistory.length - 1])
+    }
+  },[viewMode])
 
   // 캡처 및 저장 함수
   const captureAndSave = async (item) => {
