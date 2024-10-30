@@ -11,10 +11,10 @@ export const checkExtensionInstalled = () => {
             identifier: EXTENSION_IDENTIFIER
         }, "*");
 
-        // 응답 대기를 위한 타임아웃 설정 (1초)
+        // 응답 대기를 위한 타임아웃 설정 (3초)
         const timeoutId = setTimeout(() => {
             resolve(false);
-        }, 1000);
+        }, 3000);
 
         // 확장프로그램으로부터의 응답 리스너
         const messageListener = (event) => {
