@@ -1,7 +1,7 @@
 import {Card} from "../components/ui/card";
 import React, {useContext, useEffect} from "react";
-import {UrlHistoryContext} from "../components/UrlHistoryContext";
-import ScreenShareContext from "../components/ScreenShareProvider";
+import {UrlHistoryContext} from "../contexts/UrlHistoryContext";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 
 
 const TextView = () => {

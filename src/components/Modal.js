@@ -1,6 +1,6 @@
 // Modal.js
 import React, {forwardRef, useContext, useEffect} from 'react';
-import ScreenShareContext from "./ScreenShareProvider";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 
 const Modal = forwardRef(({ isOpen, onClose }, ref) => {
   const { stream, videoRef } = useContext(ScreenShareContext);

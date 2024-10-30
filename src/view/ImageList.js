@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from "react";
-import ScreenShareContext from "../components/ScreenShareProvider";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 import DetectionModal from "../components/DetectionModal";
 import {Card} from "../components/ui/card";
 

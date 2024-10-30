@@ -6,9 +6,9 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {ProSidebarProvider} from 'react-pro-sidebar';
 import Pro from "./pro";
-import {ScreenShareProvider} from "./components/ScreenShareProvider";
+import {ScreenShareProvider} from "./contexts/ScreenShareContext";
 import {BrowserRouter} from "react-router-dom";
-import {UrlHistoryProvider} from "./components/UrlHistoryContext";
+import {UrlHistoryProvider} from "./contexts/UrlHistoryContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

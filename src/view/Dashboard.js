@@ -1,5 +1,5 @@
 import {Card, CardContent, CardHeader} from "../components/ui/card";
-import ScreenShareContext from "../components/ScreenShareProvider";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 import React, {useContext, useEffect, useState} from "react";
 import Modal from "../components/Modal";
 import ImageModal from "../components/ImageModal";

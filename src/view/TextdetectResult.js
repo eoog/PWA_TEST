@@ -1,8 +1,8 @@
 import {Card} from "../components/ui/card";
 import React, {useContext, useEffect, useState} from "react";
-import {UrlHistoryContext} from "../components/UrlHistoryContext";
+import {UrlHistoryContext} from "../contexts/UrlHistoryContext";
 import {Trash2} from 'lucide-react';
-import ScreenShareContext from "../components/ScreenShareProvider";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 
 // 도박 관련 키워드 목록
 const GAMBLING_KEYWORDS = [

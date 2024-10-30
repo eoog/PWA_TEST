@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import ScreenShareContext from "./ScreenShareProvider";
+import ScreenShareContext from "../contexts/ScreenShareContext";
 
 function ScreenCapture({ setCapturedFile }) {
   const [isSharing, setIsSharing] = useState(false);
