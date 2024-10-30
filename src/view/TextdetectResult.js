@@ -3,98 +3,9 @@ import React, {useContext, useEffect, useState} from "react";
 import {UrlHistoryContext} from "../contexts/UrlHistoryContext";
 import { Trash2} from 'lucide-react';
 import ScreenShareContext from "../contexts/ScreenShareContext";
-
-
-
-
-// 도박 관련 키워드 목록
-const GAMBLING_KEYWORDS = [
-  '도박', '베팅', '카지노', '슬롯', '포커', '바카라', '룰렛',
-  'betting', 'casino', 'slot', 'poker', 'baccarat', 'roulette',
-  '토토', '배팅', 'gambling',  '잭팟', 'jackpot','페이백','홀덤',
-  '충전규정','첫충','매충','배당','충횟수','충금액',"출금왕","PragmaticPlay","Booongo","롤링왕"
-  ,"콤프","롤링",
-];
-
-const highlightGamblingContent = (text) => {
-  if (!text) return { __html: '' };
-  let processedText = text;
-  GAMBLING_KEYWORDS.forEach(keyword => {
-    const regex = new RegExp(keyword, 'gi');
-    processedText = processedText.replace(
-      regex,
-      `<span style="color: red; font-weight: bold;">$&</span>`
-    );
-  });
-  return { __html: processedText + '@@@---끝---@@@@' };
-};
-
-const hasGamblingContent = (text) => {
-  if (!text) return false;
-  return GAMBLING_KEYWORDS.some(keyword => 
-    text.toLowerCase().includes(keyword.toLowerCase())
-  );
-};
-
-// IndexedDB 초기화 함수
-const initDB = () => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('GamblingDetectionDB', 1);
-    
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('detections')) {
-        const store = db.createObjectStore('detections', { keyPath: 'id', autoIncrement: true });
-        store.createIndex('url', 'url', { unique: true }); // URL을 unique로 설정
-        store.createIndex('timestamp', 'timestamp', { unique: false });
-      }
-    };
-  });
-};
-
-
-
-// 검출 기록 삭제 함수
-const deleteDetection = async (id) => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['detections'], 'readwrite');
-    const store = transaction.objectStore('detections');
-    const request = store.delete(id);
-    
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-};
-
-// 도박 관련 키워드 검출 및 퍼센트 계산 함수
-const calculateGamblingPercent = (content) => {
-
-
-  // 텍스트에서 도박 키워드 > detectedWords 배열에 저장
-  const detectedWords = content.split(/\s+/).filter(word => 
-    GAMBLING_KEYWORDS.some(keyword => word.toLowerCase().includes(keyword.toLowerCase()))
-  );
-
-  // 전체 단어 수 
-  const totalWords = content.split(/\s+/).length;
-  
-  // 검출된 키워드 수가 특정 임계값을 넘으면 최대 95%로 제한
-  const maxPercent = 95;
-  //검출된 키워드 수를 전체 글자수로 나눠서 예시 퍼센티지 계산 / 실제 데이터는 다걸 이용 ㄱㄱ
-  const basePercent = Math.min((detectedWords.length / totalWords) * 500, maxPercent);
-  
-  // 최소 검출 시 20%부터 시작
-  const minPercent = 20;
-  
-  // 검출된 키워드가 있을 경우 최소 20%부터 시작하여 계산
-  return detectedWords.length > 0 
-    ? Math.max(Math.round(basePercent), minPercent)
-    : 0;
-};
+import {GAMBLING_KEYWORDS} from "../constants/gamblingKeywords";
+import {calculateGamblingPercent, hasGamblingContent, highlightGamblingContent} from "../utils/gamblingDetection";
+import {deleteDetection, initDB} from "../utils/indexedDB";
 
 const TextDetectView = () => {
   const urlHistory = useContext(UrlHistoryContext);
@@ -110,7 +21,6 @@ const TextDetectView = () => {
       setSelectedItem(urlHistory[urlHistory.length - 1]);
     }
   }, [urlHistory]); 
-
 
   // viewMode가 변경될 때마다 selectedItem 업데이트
   useEffect(()=>{
@@ -208,7 +118,24 @@ const TextDetectView = () => {
     };
   };
 
+  // 이미지 클릭 핸들러 추가
+  const handleImageClick = (image, title) => {
+    if (!image) return;
 
+    Swal.fire({
+      imageUrl: image,
+      imageAlt: title,
+      title: title,
+      width: '80%',
+      padding: '1em',
+      showConfirmButton: false,
+      showCloseButton: true,
+      backdrop: `rgba(0,0,0,0.8)`,
+      customClass: {
+        image: 'max-h-[80vh] object-contain'
+      }
+    });
+  };
 
   useEffect(() => {
     if (urlHistory.length > 0 && !selectedItem) {
@@ -442,18 +369,26 @@ const TextDetectView = () => {
                     </details>
                   </>
                 )}
-  
-                {isImageModalOpen && (
-                  <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-                    onClick={() => setIsImageModalOpen(false)}
-                  >
-                    <img 
-                      src={selectedItem.screenshot} 
-                      alt="Enlarged screenshot" 
-                      className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                    />
-                  </div>
+                {/* 스크린샷 이미지 */}
+                {selectedItem.screenshot && (
+                    <div className="mb-4 sm:mb-6">
+                      <h4 className="font-semibold mb-2 text-sm sm:text-base">
+                        {viewMode === 'detections' ? '검출 스크린샷' : '스크린샷'}
+                      </h4>
+                      <div className="relative w-full sm:flex sm:justify-center">
+                        <div className="relative group cursor-pointer"
+                             onClick={() => handleImageClick(selectedItem.screenshot, selectedItem.title)}>
+                          <img
+                              src={selectedItem.screenshot}
+                              alt={`${viewMode === 'detections' ? '검출' : ''} 스크린샷`}
+                              className="w-full sm:w-auto rounded-lg shadow-md object-contain max-h-[50vh]"
+                          />
+                          <div className="absolute bottom-2 right-2 text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
+                            클릭하여 확대
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                 )}
               </div>
             ) : (
