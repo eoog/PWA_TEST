@@ -4,7 +4,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8089;
 
 // SSL 인증서 파일 경로 설정
 const options = {
@@ -29,3 +29,4 @@ https.createServer(options, app).listen(PORT, () => {
 // app.listen(PORT, () => {
 //   console.log(`서버가 https://localhost:${PORT} 에서 실행 중입니다.`);
 // });
+
