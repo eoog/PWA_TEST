@@ -86,7 +86,7 @@ export default function MenuSidebar() {
               </MenuItem>
             </Link>
             <Link to="/text-result ">
-              <MenuItem style={getMenuItemStyle("/TextDetectView ")} icon={<HomeOutlinedIcon />}>
+              <MenuItem style={getMenuItemStyle("/text-result")} icon={<HomeOutlinedIcon />}>
                 <p style={{textDecoration:"none"}}>도박성 텍스트 결과</p>
               </MenuItem>
             </Link>
