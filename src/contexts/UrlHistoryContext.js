@@ -1,7 +1,7 @@
 // UrlHistoryContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import {GAMBLING_KEYWORDS} from "../constants/gamblingKeywords";
-import changeDataForm from "../utils/changeDataForm";
+import formConverter from "../utils/formConverter";
 
 export const UrlHistoryContext = createContext();
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
@@ -118,7 +118,7 @@ export const UrlHistoryProvider = ({ children }) => {
         event.data.type === "HHH" &&
         event.data.source === EXTENSION_IDENTIFIER
       ) {
-        const currentData = changeDataForm(event.data.data.data);
+        const currentData = formConverter(event.data.data.data);
 
         if (currentData[0]?.title === "PWA") setIsPaused(true);
 

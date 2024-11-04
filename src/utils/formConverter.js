@@ -1,5 +1,5 @@
 
-const changeDataForm = (currentData) => {
+const formConverter = (currentData) => {
     const newData = currentData;
     currentData[0].검출유무 =0;
     currentData[0].accuracy = 0;
@@ -8,4 +8,4 @@ const changeDataForm = (currentData) => {
     return newData;
 }
 
-export default changeDataForm;
+export default formConverter;
