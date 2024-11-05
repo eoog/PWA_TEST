@@ -166,7 +166,7 @@ const TextDetectView = () => {
                                 검출 시각: {new Date(detection.detectedAt).toLocaleString()}
                                 {calculateGamblingPercent(detection.content) > 0 && (
                                     <span className="text-red-400 pl-4">
-                              도박성 {calculateGamblingPercent(detection.content)}%
+                              score :  {detection.score}
                             </span>
                                 )}
                               </p>
@@ -195,7 +195,7 @@ const TextDetectView = () => {
                         {selectedItem.title}
                         {viewMode === 'detections' && (
                             <span className="text-red-400 pl-4">
-                        도박성 {calculateGamblingPercent(selectedItem.content)}%
+                        score :  {selectedItem.score}
                       </span>
                         )}
                       </h2>

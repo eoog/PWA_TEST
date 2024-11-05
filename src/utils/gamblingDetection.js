@@ -10,7 +10,7 @@ export const highlightGamblingContent = (text) => {
             `<span style="color: red; font-weight: bold;">$&</span>`
         );
     });
-    return { __html: processedText + '@@@---끝---@@@@' };
+    return { __html: processedText };
 };
 
 export const hasGamblingContent = (text) => {
