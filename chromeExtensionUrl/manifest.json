@@ -17,12 +17,12 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "newBackground.js"
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["newContent.js"]
+      "js": ["content.js"]
     }
   ],
   "action": {
