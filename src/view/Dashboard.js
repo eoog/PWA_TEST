@@ -198,9 +198,9 @@ const Dashboard = () => {
               }
             }}
             style={{
-              width: '100%',
+              width: 'auto',
               height: 'auto',
-              maxHeight: '90vh',
+              maxHeight: 'auto',
               cursor: 'pointer'
             }}
         />
