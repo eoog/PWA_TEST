@@ -80,11 +80,11 @@ export default function SidebarMenu() {
                 <p style={{textDecoration:"none"}}>선정성-검출 이미지</p>
               </MenuItem>
             </Link>
-            <Link to="/text">
-              <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>
-                <p style={{textDecoration:"none"}}>탭 정보(텍스트)</p>
-              </MenuItem>
-            </Link>
+            {/*<Link to="/text">*/}
+            {/*  <MenuItem style={getMenuItemStyle("/text")} icon={<HomeOutlinedIcon />}>*/}
+            {/*    <p style={{textDecoration:"none"}}>탭 정보(텍스트)</p>*/}
+            {/*  </MenuItem>*/}
+            {/*</Link>*/}
             <Link to="/text-result ">
               <MenuItem style={getMenuItemStyle("/text-result")} icon={<HomeOutlinedIcon />}>
                 <p style={{textDecoration:"none"}}>도박성 텍스트 결과</p>
