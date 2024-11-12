@@ -4,36 +4,36 @@ const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 let previousContent = '';
 
 // 컨텐츠 변경 감지 함수
-function detectContentChanges() {
-    const currentContent = document.body.innerText;
+// function detectContentChanges() {
+//     const currentContent = document.body.innerText;
+//
+//     if (currentContent !== previousContent) {
+//         previousContent = currentContent;
+//
+//         // PWA로 변경된 컨텐츠 전송
+//         window.postMessage({
+//             type: "CONTENT_CHANGED",
+//             source: EXTENSION_IDENTIFIER,
+//             data: {
+//                 url: window.location.href,
+//                 title: document.title,
+//                 content: currentContent
+//             }
+//         }, "*");
+//     }
+// }
 
-    if (currentContent !== previousContent) {
-        previousContent = currentContent;
-
-        // PWA로 변경된 컨텐츠 전송
-        window.postMessage({
-            type: "CONTENT_CHANGED",
-            source: EXTENSION_IDENTIFIER,
-            data: {
-                url: window.location.href,
-                title: document.title,
-                content: currentContent
-            }
-        }, "*");
-    }
-}
-
-// DOM 변경 감지를 위한 MutationObserver 설정
-const observer = new MutationObserver(() => {
-    detectContentChanges();
-});
-
-// Observer 시작
-observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true
-});
+// // DOM 변경 감지를 위한 MutationObserver 설정
+// const observer = new MutationObserver(() => {
+//     detectContentChanges();
+// });
+//
+// // Observer 시작
+// observer.observe(document.body, {
+//     childList: true,
+//     subtree: true,
+//     characterData: true
+// });
 
 // 기존 이벤트 리스너
 window.addEventListener("message", (event) => {
