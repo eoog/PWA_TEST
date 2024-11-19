@@ -215,31 +215,38 @@ const Dashboard = () => {
   }, [stream, videoRef]);
 
   return (
-      <div className="min-h-screen bg-gray-100 p-8 w-full flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-6">
+      <div
+          className="min-h-screen bg-gray-100 p-4 md:p-8 w-full flex flex-col gap-4">
+        {/* 이미지 카드 그리드 - 모바일에서는 1열, 태블릿 이상에서 2열 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* 캔버스(캡쳐) 이미지 카드 */}
           <Card className="h-full">
             <CardContent
                 className="h-full items-center justify-center"
-                onClick={() => canvasImage && handleImageClick(canvasImage, '캡쳐된 화면')}
+                onClick={() => canvasImage && handleImageClick(canvasImage,
+                    '캡쳐된 화면')}
                 style={{cursor: canvasImage ? 'pointer' : 'default'}}
             >
-              <CardHeader className="text-neutral-500 font-bold text-2xl">
-                <div className="flex gap-6 items-center justify-center">
+              <CardHeader
+                  className="text-neutral-500 font-bold text-lg md:text-2xl">
+                <div
+                    className="flex gap-4 md:gap-6 items-center justify-center">
                   <div>캡쳐된 화면</div>
                 </div>
               </CardHeader>
-              <div className="items-center flex justify-center min-h-[300px]">
+              <div
+                  className="items-center flex justify-center min-h-[200px] md:min-h-[300px]">
                 {isLoadingCanvas ? (
-                    <Spinner />
+                    <Spinner/>
                 ) : canvasImage ? (
                     <div className="relative group">
                       <img
                           src={canvasImage}
                           alt="Canvas capture"
-                          className="max-h-[500px] object-contain"
+                          className="max-h-[300px] md:max-h-[500px] w-full object-contain"
                       />
-                      <div className="absolute bottom-2 right-2 text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
+                      <div
+                          className="absolute bottom-2 right-2 text-xs md:text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
                         클릭하여 확대
                       </div>
                     </div>
@@ -254,25 +261,30 @@ const Dashboard = () => {
           <Card className="h-full">
             <CardContent
                 className="h-full items-center justify-center"
-                onClick={() => detectionImage && handleImageClick(detectionImage, '선정성 검출 이미지')}
+                onClick={() => detectionImage && handleImageClick(
+                    detectionImage, '선정성 검출 이미지')}
                 style={{cursor: detectionImage ? 'pointer' : 'default'}}
             >
-              <CardHeader className="text-neutral-500 font-bold text-2xl">
-                <div className="flex gap-6 items-center justify-center">
+              <CardHeader
+                  className="text-neutral-500 font-bold text-lg md:text-2xl">
+                <div
+                    className="flex gap-4 md:gap-6 items-center justify-center">
                   <div>선정성 검출 이미지</div>
                 </div>
               </CardHeader>
-              <div className="items-center flex justify-center min-h-[300px]">
+              <div
+                  className="items-center flex justify-center min-h-[200px] md:min-h-[300px]">
                 {isLoadingDetection ? (
-                    <Spinner />
+                    <Spinner/>
                 ) : detectionImage ? (
                     <div className="relative group">
                       <img
                           src={detectionImage}
                           alt="Detection result"
-                          className="max-h-[500px] object-contain"
+                          className="max-h-[300px] md:max-h-[500px] w-full object-contain"
                       />
-                      <div className="absolute bottom-2 right-2 text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
+                      <div
+                          className="absolute bottom-2 right-2 text-xs md:text-sm text-gray-500 bg-white bg-opacity-75 px-2 py-1 rounded">
                         클릭하여 확대
                       </div>
                     </div>
@@ -286,21 +298,26 @@ const Dashboard = () => {
 
         {/* 실시간 화면 공유 카드 */}
         <Card
-            className="w-full mt-6"
+            className="w-full mt-4 md:mt-6 mx-auto"
             style={{
               maxHeight: '90vh',
               maxWidth: '90vw',
-              overflow: 'hidden',
-              margin: 'auto'
+              overflow: 'hidden'
             }}
         >
-          <CardContent style={{cursor: stream ? 'pointer' : 'default'}}>
-            <CardHeader className="text-neutral-500 font-bold text-2xl">
-              <div className="flex gap-6 items-center justify-center">
+          <CardContent
+              className="p-2 md:p-4"
+              style={{cursor: stream ? 'pointer' : 'default'}}
+          >
+            <CardHeader
+                className="text-neutral-500 font-bold text-lg md:text-2xl">
+              <div className="flex gap-4 md:gap-6 items-center justify-center">
                 <div>실시간 화면 공유</div>
               </div>
             </CardHeader>
-            {renderVideoContent()}
+            <div className="w-full h-full">
+              {renderVideoContent()}
+            </div>
           </CardContent>
         </Card>
       </div>
