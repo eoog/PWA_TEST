@@ -28,18 +28,64 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const [boxes, setBoxes] = useState([]);
   const canvasRef = useRef(null);
 
-  // 서비스 워커 알림 처리
-  const sendNotification = async () => {
+  const sendNotification = async (type, message) => {
     const permission = await Notification.requestPermission();
-    if (Notification.permission === "granted") {
-      new Notification("[선정성]", {
-        body: `[선정성] - 선정성이 검출되었습니다.`,
+
+    if (permission === "granted") {
+      // 알림 타입별 설정
+      const notificationOptions = {
+        adult: {
+          title: "🚨 성인 콘텐츠 감지",
+          icon: process.env.PUBLIC_URL + '/meer.ico',
+        },
+        inappropriate: {
+          title: "⚠️ 부적절 콘텐츠",
+          icon: process.env.PUBLIC_URL + '/meer.ico',
+        },
+        spam: {
+          title: "🚫 스팸 감지",
+          icon: process.env.PUBLIC_URL + '/meer.ico',
+        }
+      };
+
+      const options = {
+        body: message,
+        ...notificationOptions[type],
+        tag: type,
+        requireInteraction: false,
         icon: process.env.PUBLIC_URL + '/meer.ico'
-      });
+      };
+
+      try {
+        const notification = new Notification(options.title, options);
+
+        notification.onclick = function() {
+          window.focus();
+          notification.close();
+        };
+
+        setTimeout(() => notification.close(), 5000);
+
+      } catch (error) {
+        console.error('알림 생성 실패:', error);
+        showFallbackAlert(message);
+      }
     } else {
-      alert("알림 권한이 없습니다.");
+      showFallbackAlert(message);
     }
   };
+
+  const showFallbackAlert = (message) => {
+    const alert = document.createElement('div');
+    alert.className = 'alert-message';
+    alert.textContent = message;
+    document.body.appendChild(alert);
+
+    setTimeout(() => {
+      alert.remove();
+    }, 3000);
+  };
+
 
   // IndexedDB 초기화
   const initializeDB = useCallback(async (dbName) => {
@@ -286,7 +332,7 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
 
   // 서비스 워커 메시지 처리
   const handleMessage = async () => {
-    sendNotification();
+    sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
     // if ('serviceWorker' in navigator) {
     //   try {
     //     const registration = await navigator.serviceWorker.register('/service-worker.js');
