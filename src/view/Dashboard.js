@@ -163,21 +163,29 @@ const Dashboard = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    if (!stream) {
+      startScreenShare()
+    }
+  }, []);
+
   // Video content renderer
   const renderVideoContent = () => {
-    if (!stream) {
+    if (!stream || stream.getTracks().every(track => track.readyState === "ended")) {
       return (
           <div
               onClick={() => startScreenShare()}
-              className="flex flex-col items-center justify-center h-[50vh] text-neutral-500 cursor-pointer"
+              className="flex flex-col items-center justify-center h-[50vh] text-neutral-500 cursor-pointer  rounded-lg hover:bg-neutral-200 transition-colors"
           >
             <img
-                className="w-24 h-24 mb-4"
+                className="w-24 h-24 mb-4 opacity-80"
                 src={require('../meer.ico')}
                 alt="Start sharing"
             />
-            <p className="text-xl font-semibold">화면 공유가 시작되지 않았습니다</p>
-            <p className="mt-2">화면 공유를 시작하려면 클릭하세요</p>
+            <p className="text-xl font-semibold">
+              {stream ? "화면 공유가 중지되었습니다" : "화면 공유가 시작되지 않았습니다"}
+            </p>
+            <p className="mt-2">화면 공유를 {stream ? "다시 " : ""}시작하려면 클릭하세요</p>
           </div>
       );
     }
