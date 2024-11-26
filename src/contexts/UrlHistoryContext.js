@@ -2,6 +2,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import {GAMBLING_KEYWORDS} from "../constants/gamblingKeywords";
 import formConverter from "../utils/formConverter";
+import YOLOv8ObjectDetection
+                                                     from "../components/YOLOv8ObjectDetection";
 
 export const UrlHistoryContext = createContext();
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
@@ -235,6 +237,7 @@ export const UrlHistoryProvider = ({ children }) => {
     }
   }
 
+  const [capturedFile, setCapturedFile] = useState(null); // 캡처된 파일 상태
   useEffect(() => {
     const messageListener = async (event) => {
       if (
@@ -248,6 +251,19 @@ export const UrlHistoryProvider = ({ children }) => {
           return ;
         }
 
+       // console.log(currentData[0].screenshot)
+        const imageUrl = currentData[0].screenshot;
+
+// 이미지 URL에서 이미지 파일 생성
+        fetch(imageUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const file = new File([blob], 'screenshot.png', { type: 'image/png' });
+
+          // 이제 file 변수에 이미지 파일 객체가 저장됩니다.
+          //console.log(file);
+        setCapturedFile(file)
+        });
         setIsPaused(false);
 
 
@@ -306,6 +322,7 @@ export const UrlHistoryProvider = ({ children }) => {
 
   return (
     <UrlHistoryContext.Provider value={urlHistory}>
+      <YOLOv8ObjectDetection capturedFile={capturedFile}/>
       {children}
     </UrlHistoryContext.Provider>
   );

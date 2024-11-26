@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
+import React, {useContext, useEffect} from 'react';
 import './App.css';
-import { Box } from '@mui/material';
+import { Box }                        from '@mui/material';
 import { Route, Routes, useLocation } from "react-router-dom";
-import { ExtensionProvider } from './contexts/ExtensionContext';
-import { ProtectedRoute } from './components/common/ProtectedRoute';
-import SidebarMenu from "./components/common/SidebarMenu";
-import Dashboard from "./view/Dashboard";
-import ImageBoard from "./view/ImageBoard";
-import InstallGuide from "./view/installGuide";
-import DemoInstallGuide from "./view/DemoInstallGuide";
-import TextView from "./view/TextView";
-import TextDetectView from "./view/TextdetectResult";
+import { ExtensionProvider }          from './contexts/ExtensionContext';
+import { ProtectedRoute }             from './components/common/ProtectedRoute';
+import SidebarMenu                    from "./components/common/SidebarMenu";
+import Dashboard                      from "./view/Dashboard";
+import ImageBoard                     from "./view/ImageBoard";
+import InstallGuide                   from "./view/installGuide";
+import DemoInstallGuide               from "./view/DemoInstallGuide";
+import TextView                       from "./view/TextView";
+import TextDetectView                 from "./view/TextdetectResult";
+import ScreenShareContext             from "./contexts/ScreenShareContext";
 
 async function requestNotificationPermission() {
   try {
@@ -34,10 +35,28 @@ async function requestNotificationPermission() {
 }
 
 function App() {
+  const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+
+  const { stream, videoRef, startScreenShare } = useContext(ScreenShareContext);
+
+  // 데이터 요청 함수
+  const requestShareAndContent = () => {
+    window.postMessage({
+      type: "SHARE",
+      source: "SHARE",
+      identifier: EXTENSION_IDENTIFIER
+    }, "*")
+  };
   const location = useLocation();
 
   useEffect(() => {
-    requestNotificationPermission();
+    requestNotificationPermission().then(value => ()=>{
+      console.log("성공")
+      requestShareAndContent()
+    }).catch(
+        requestNotificationPermission()
+    )
+
   }, []);
 
   return (

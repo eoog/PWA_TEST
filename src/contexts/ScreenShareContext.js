@@ -7,6 +7,7 @@ export const ScreenShareProvider = ({ children }) => {
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
 
+
   const startScreenShare = async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({

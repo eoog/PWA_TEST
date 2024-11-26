@@ -30,7 +30,7 @@ function ScreenCapture({ setCapturedFile }) {
     try {
       
       // 임시로 주석 추후에 다시 주석 해제후 실행
-      //requestShareAndContent();
+      requestShareAndContent();
       setIsSharing(true);
 
       // 캡처 간격에 맞춰 캡처 호출

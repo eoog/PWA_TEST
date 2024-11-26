@@ -237,8 +237,9 @@ const YOLOv8ObjectDetection = ({ capturedFile }) => {
   const drawDetections = useCallback(async (canvas, image, boxes) => {
     const ctx = canvas.getContext('2d');
     const img = new Image();
-
+    const imageData = canvas.toDataURL('image/png');
     img.onload = () => {
+    saveImageToDB('canvasImage', imageData);
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
