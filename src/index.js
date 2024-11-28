@@ -1,26 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React                          from 'react';
+import ReactDOM                       from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App                            from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
-import {ProSidebarProvider} from 'react-pro-sidebar';
-import Pro from "./pro";
-import {ScreenShareProvider} from "./contexts/ScreenShareContext";
-import {BrowserRouter} from "react-router-dom";
-import {UrlHistoryProvider} from "./contexts/UrlHistoryContext";
+import reportWebVitals                from './reportWebVitals';
+import {ProSidebarProvider}           from 'react-pro-sidebar';
+import {ScreenShareProvider}          from "./contexts/ScreenShareContext";
+import {BrowserRouter}                from "react-router-dom";
+import {UrlHistoryProvider}           from "./contexts/UrlHistoryContext";
+import CaptureToDetection
+                                      from "./components/core/CaptureToDetection";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <BrowserRouter>  {/* BrowserRouter로 App 감싸기 */}
-    <ScreenShareProvider>
-      <UrlHistoryProvider>
-      <ProSidebarProvider>
-        <Pro/>
-        <App/>
-      </ProSidebarProvider>
-      </UrlHistoryProvider>
-    </ScreenShareProvider>
+      <ScreenShareProvider>
+        <UrlHistoryProvider>
+          <ProSidebarProvider>
+            <CaptureToDetection/>
+            <App/>
+          </ProSidebarProvider>
+        </UrlHistoryProvider>
+      </ScreenShareProvider>
     </BrowserRouter>
 );
 
