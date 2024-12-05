@@ -297,14 +297,14 @@ export default function Home() {
                     <div className="text-[40px] text-neutral-500 animate-pulse">
                       화면 공유가 실행중입니다
                     </div>
-                    <div className="flex gap-1">
-                      {[...Array(10)].map((_, i) => (
+                    <div className="flex gap-1 mt-8">
+                      {[...Array(5)].map((_, i) => (
                           <span
                               key={i}
                               className="animate-bounce text-primary"
                               style={{animationDelay: `${i * 0.1}s`}}
                           >
-              ~
+              <img width={64} src="/meer.ico"/>
             </span>
                       ))}
                     </div>

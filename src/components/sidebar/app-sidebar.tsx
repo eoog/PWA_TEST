@@ -1,14 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  GalleryVerticalEnd,
-  SquareTerminal,
-} from "lucide-react"
+import {BookOpen, Bot, SquareTerminal,} from "lucide-react"
 
 import {NavUser} from "@/components/sidebar/nav-user"
 import {TeamSwitcher} from "@/components/sidebar/team-switcher"
@@ -30,19 +23,9 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+      name: "meerCat.ch",
+      logo: "/meer.ico",
+      plan: "",
     },
   ],
   navMain: [

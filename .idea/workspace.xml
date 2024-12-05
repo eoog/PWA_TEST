@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c2dfbcf-d02f-42c2-95d9-41c893e2c178" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/gambling/gambling-utils.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/gambling/gambling-utils.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/gambling/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/gambling/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/team-switcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/team-switcher.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +64,7 @@
       <recent name="D:\next\pwa\src\lib\provider" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -87,8 +87,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
   </component>
@@ -109,7 +109,7 @@
       <option name="presentableId" value="Default" />
       <updated>1733300933996</updated>
       <workItem from="1733300935059" duration="3698000" />
-      <workItem from="1733354949535" duration="20915000" />
+      <workItem from="1733354949535" duration="21847000" />
     </task>
     <task id="LOCAL-00001" summary="in">
       <option name="closed" value="true" />
@@ -119,7 +119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733377546391</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="in">
+      <option name="closed" value="true" />
+      <created>1733378175207</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733378175207</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
