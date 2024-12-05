@@ -121,14 +121,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
       }
 
-          if (request.action === "minimize_window") {
-        const currentTab = await chrome.tabs.get(sender.tab.id);
-        // PWA 앱이 아닌 경우에만 최소화
-        if (!currentTab.url.includes('localhost') || !currentTab.url.includes('PWA')) {
-          const window = await chrome.windows.getCurrent();
-          await chrome.windows.update(window.id, {state: 'minimized'});
-        }
+       if (request.action === "minimize_window") {
+        const window = await chrome.windows.getCurrent();
+        await chrome.windows.update(window.id, {state: 'minimized'});
       }
+
 
 
       if (request.type === "HHH") {
