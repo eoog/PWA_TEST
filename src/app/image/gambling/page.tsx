@@ -112,26 +112,33 @@ export default function DetectionImage() {
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {images.map((image, index) => (
-                <div
-                    key={`${image.title}-${index}`}  // index를 추가하여 unique key 생성
-                    className="aspect-square rounded-xl bg-muted/50 overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
-                    onClick={() => image.screenshot && handleImageClick(image.screenshot, '도박 검출 이미지')}
-                >
-                  <div className="relative group h-full w-full">
-                    <img
-                        src={image.screenshot}
-                        alt={`Detection ${index + 1}`}
-                        className="w-full h-full object-cover object-center"
-                        style={{width: "100%", height: "100%"}}
-                    />
+            {images.length > 0 ? (
+                images.map((image, index) => (
                     <div
-                        className="absolute bottom-2 right-2 text-xs text-foreground/75 bg-background/75 px-2 py-1 rounded">
-                      클릭하여 확대
+                        key={`${image.title}-${index}`}
+                        className="aspect-square rounded-xl bg-muted/50 overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                        onClick={() => image.screenshot && handleImageClick(image.screenshot, '도박 검출 이미지')}
+                    >
+                      <div className="relative group h-full w-full">
+                        <img
+                            src={image.screenshot}
+                            alt={`Detection ${index + 1}`}
+                            className="w-full h-full object-cover object-center"
+                            style={{width: "100%", height: "100%"}}
+                        />
+                        <div
+                            className="absolute bottom-2 right-2 text-xs text-foreground/75 bg-background/75 px-2 py-1 rounded">
+                          클릭하여 확대
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                ))
+            ) : (
+                <div
+                    className="col-span-full flex items-center justify-center h-40 text-muted-foreground">
+                  검출된 이미지가 없습니다.
                 </div>
-            ))}
+            )}
           </div>
 
           {totalPages > 1 && (
