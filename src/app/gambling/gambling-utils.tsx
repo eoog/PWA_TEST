@@ -1,9 +1,15 @@
-export const initDB = () => {
+interface GamblingDB extends IDBDatabase {
+  // 필요한 추가 타입 정의
+}
+
+export const initDB = (): Promise<GamblingDB> => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('GamblingDetectionDB', 1);
+    const request = indexedDB.open('gambling-db', 1);
 
     request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      resolve(request.result as GamblingDB);
+    };
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -18,6 +24,8 @@ export const initDB = () => {
     };
   });
 };
+
+const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
 export const GAMBLING_KEYWORDS = [
   "첫충", "단폴", "다리다리", "매충", "꽁머니", "슈어맨",

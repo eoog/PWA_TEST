@@ -20,12 +20,25 @@ interface Detection {
   score: number;
 }
 
+interface UrlHistoryItem {
+  url: string;
+  title: string;
+  content: string;
+  screenshot?: string;
+}
+
 const truncateUrl = (url: string) => {
   if (url.length > 20) {
     return url.substring(0, 20) + '...';
   }
   return url;
 };
+
+const convertToDetection = (item: UrlHistoryItem): Detection => ({
+  ...item,
+  detectedAt: new Date(),
+  score: 0
+});
 
 export default function Gambling() {
   const {urlHistory} = useGambling();
@@ -53,7 +66,7 @@ export default function Gambling() {
 
   useEffect(() => {
     if (urlHistory.length > 0 && !selectedItem) {
-      setSelectedItem(urlHistory[0]);
+      setSelectedItem(convertToDetection(urlHistory[0]));
     }
     loadDetectionHistory();
   }, [urlHistory]);
@@ -145,7 +158,7 @@ export default function Gambling() {
                                     'bg-primary/10 border-l-4 border-primary' :
                                     'bg-card hover:bg-accent/50'
                                 }`}
-                                onClick={() => setSelectedItem(item)}
+                                onClick={() => setSelectedItem(convertToDetection(item))}
                             >
                               <h4 className="font-medium text-sm">{item.title || 'No Title'}</h4>
                               <p className="text-sm text-muted-foreground">
@@ -169,7 +182,7 @@ export default function Gambling() {
                                 }`}
                                 onClick={() => {
                                   const originalItem = urlHistory.find(item => item.url === detection.url);
-                                  setSelectedItem(originalItem || detection);
+                                  setSelectedItem(originalItem ? convertToDetection(originalItem) : detection);
                                 }}
                             >
                               <div className="flex justify-between items-start">

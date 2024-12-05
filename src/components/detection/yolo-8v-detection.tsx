@@ -31,6 +31,8 @@ const CONSTANTS = {
   NUM_BOXES: 2100
 };
 
+const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+
 // YOLO 클래스 정의
 const YOLO_CLASSES = [
   '여성 생식기 가리기', '여성 얼굴', '둔부 노출', '여성 유방 노출',
@@ -300,45 +302,51 @@ const YOLOv8 = () => {
     const img = new Image();
 
     img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+        let detectionFound = false;
 
-      let detectionFound = false;
+        boxes.forEach(box => {
+            const [x1, y1, x2, y2, label, confidence] = box;
 
-      boxes.forEach(box => {
-        const [x1, y1, x2, y2, label, confidence] = box;
+            if (YOLO_CLASSES.includes(label)) {
+                // 박스 그리기
+                ctx.strokeStyle = "#00FF00";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-        if (YOLO_CLASSES.includes(label)) {
-          // 박스 그리기
-          ctx.strokeStyle = "#00FF00";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                // 레이블 그리기
+                ctx.fillStyle = "#00FF00";
+                ctx.font = "18px serif";
+                const text = `${label} ${Math.round(confidence * 100)}%`;
+                const textWidth = ctx.measureText(text).width;
 
-          // 레이블 그리기
-          ctx.fillStyle = "#00FF00";
-          ctx.font = "18px serif";
-          const text = `${label} ${Math.round(confidence * 100)}%`;
-          const textWidth = ctx.measureText(text).width;
+                ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
+                ctx.fillStyle = "#000000";
+                ctx.fillText(text, x1 + 5, y1 - 5);
 
-          ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
-          ctx.fillStyle = "#000000";
-          ctx.fillText(text, x1 + 5, y1 - 5);
+                detectionFound = true;
+            }
+        });
 
-          detectionFound = true;
+        // 감지 시 알림, 저장 및 창 최소화
+        if (detectionFound && Date.now() - lastAlertTimeRef.current > CONSTANTS.ALERT_COOLDOWN) {
+            const newImageData = canvas.toDataURL('image/png');
+            saveImageToDB('DetectionImageDB', newImageData);
+            handleMessage();
+            lastAlertTimeRef.current = Date.now();
+            
+            // 창 최소화 메시지 전송
+            window.postMessage({
+                type: "SHARE",
+                source: "SHARE",
+                identifier: EXTENSION_IDENTIFIER
+            }, "*");
         }
-      });
 
-      // 감지 시 알림 및 저장
-      if (detectionFound && Date.now() - lastAlertTimeRef.current > CONSTANTS.ALERT_COOLDOWN) {
-        const newImageData = canvas.toDataURL('image/png');
-        saveImageToDB('DetectionImageDB', newImageData);
-        handleMessage();
-        lastAlertTimeRef.current = Date.now();
-      }
-
-      URL.revokeObjectURL(img.src);
+        URL.revokeObjectURL(img.src);
     };
 
     img.src = URL.createObjectURL(image);
