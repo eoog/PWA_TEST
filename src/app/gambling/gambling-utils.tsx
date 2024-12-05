@@ -1,9 +1,15 @@
-export const initDB = () => {
+interface GamblingDB extends IDBDatabase {
+  // 필요한 추가 타입 정의
+}
+
+export const initDB = (): Promise<GamblingDB> => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('GamblingDetectionDB', 1);
+    const request = indexedDB.open('gambling-db', 1);
 
     request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      resolve(request.result as GamblingDB);
+    };
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -19,6 +25,8 @@ export const initDB = () => {
   });
 };
 
+const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+
 export const GAMBLING_KEYWORDS = [
   "첫충", "단폴", "다리다리", "매충", "꽁머니", "슈어맨",
   "다음드", "한폴낙", "두폴낙", "단폴", "프리벳", "카지노", "슬롯", "바카라", "블랙잭", "잭팟", "포커",
@@ -27,7 +35,7 @@ export const GAMBLING_KEYWORDS = [
   "포인트", "입출금", "게임", "토큰", "인플레이", "토너먼트",
   "캐시", "적중", "텔레그램", "복권", "레이싱", "입출금",
   "가상화폐", "폴더", "페이벡", "환전", "추천인", "배당",
-  "배당율", "미성년자", "가입", "청소년"
+  "배당율", "미성년자", "가입", "��소년"
 ];
 
 export const DETECTION_SETTINGS = {
