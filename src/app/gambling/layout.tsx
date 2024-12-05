@@ -26,7 +26,7 @@ export default function Layout({children}: { children: ReactNode }) {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block"/>
                 <BreadcrumbItem>
-                  <Link href="/image/detection">
+                  <Link href="/gambling">
                     <BreadcrumbPage>도박 검출</BreadcrumbPage>
                   </Link>
                 </BreadcrumbItem>

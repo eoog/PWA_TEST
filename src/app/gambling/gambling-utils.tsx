@@ -4,7 +4,7 @@ interface GamblingDB extends IDBDatabase {
 
 export const initDB = (): Promise<GamblingDB> => {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('gambling-db', 1);
+    const request = indexedDB.open('GamblingDetectionDB', 1);
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
