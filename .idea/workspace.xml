@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c2dfbcf-d02f-42c2-95d9-41c893e2c178" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/image/detection/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/image/detection/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/image/gambling/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/image/gambling/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/content.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +35,7 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="2pkCxbkkmbOEepjlJTjJr9TwK13" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
@@ -40,7 +44,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "next",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/next/pwa/src/app/gambling",
+    "last_opened_file_path": "C:/workspace/PWA",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
     "node.js.detected.package.tslint": "true",
@@ -57,6 +61,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\workspace\PWA" />
       <recent name="D:\next\pwa\src\app\gambling" />
       <recent name="D:\next\pwa\public" />
       <recent name="D:\next\pwa\src\app\image" />
