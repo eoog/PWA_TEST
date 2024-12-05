@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import CaptureToDetection from "@/components/detection/capture-to-detection";
+import {ReactNode} from "react";
 
-export default function layout({children}) {
+export default function Layout({children}: { children: ReactNode }) {
   return (
       <>
         <header

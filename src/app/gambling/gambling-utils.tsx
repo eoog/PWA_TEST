@@ -36,7 +36,7 @@ export const DETECTION_SETTINGS = {
   MULTIPLIER: 500
 };
 
-export const highlightGamblingContent = (text) => {
+export const highlightGamblingContent = (text: string) => {
   if (!text) return {__html: ''};
   let processedText = text;
   GAMBLING_KEYWORDS.forEach(keyword => {
@@ -49,7 +49,7 @@ export const highlightGamblingContent = (text) => {
   return {__html: processedText};
 };
 
-export const hasGamblingContent = (text) => {
+export const hasGamblingContent = (text: string) => {
   if (!text) return false;
   return GAMBLING_KEYWORDS.some(keyword =>
       text.toLowerCase().includes(keyword.toLowerCase())
@@ -59,7 +59,7 @@ export const hasGamblingContent = (text) => {
 /**
  * 도박 관련 키워드 검출 및 퍼센트 계산 함수
  * */
-export const calculateGamblingPercent = (content) => {
+export const calculateGamblingPercent = (content: string) => {
   if (!content) return 0;
 
   // 텍스트에서 도박 키워드 > detectedWords 배열에 저장
