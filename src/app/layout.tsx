@@ -1,17 +1,39 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import {Providers} from "@/app/providers";
+import {AppSidebar} from "@/components/sidebar/app-sidebar";
+import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
+import CaptureToDetection from "@/components/detection/capture-to-detection";
+import {GamblingProvider} from "@/lib/provider/gambling-context";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const customFont = localFont(
+    {
+      src: [
+        {
+          path: './fonts/Pretendard-Light.otf',
+          weight: '300',
+          style: 'light',
+        },
+        {
+          path: './fonts/Pretendard-Regular.otf',
+          weight: '400',
+          style: 'normal',
+        },
+        {
+          path: './fonts/Pretendard-Medium.otf',
+          weight: '500',
+          style: 'normal',
+        },
+        {
+          path: './fonts/Pretendard-Bold.otf',
+          weight: '600',
+          style: 'normal',
+        },
+
+      ],
+    })
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,17 +41,27 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+      <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={customFont.className}
       >
-        {children}
+      <Providers>
+        <GamblingProvider>
+          <CaptureToDetection/>
+          <SidebarProvider>
+            <AppSidebar/>
+            <SidebarInset>
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+        </GamblingProvider>
+      </Providers>
       </body>
-    </html>
+      </html>
   );
 }
