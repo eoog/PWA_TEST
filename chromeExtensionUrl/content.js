@@ -52,6 +52,14 @@ window.addEventListener("message", (event) => {
         chrome.runtime.sendMessage({ type: "HHH" });
     }
 
+    if (event.data.type === "CLOSE_TAB" &&
+        event.data.identifier === EXTENSION_IDENTIFIER) {
+        chrome.runtime.sendMessage({ 
+          action: "close_tab",
+          url: event.data.url 
+        });
+    }
+
     return true
 });
 

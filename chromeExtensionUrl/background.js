@@ -139,6 +139,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           });
         }
       }
+
+      if (request.action === "close_tab") {
+        const tabs = await chrome.tabs.query({});
+        const targetTab = tabs.find(tab => tab.url === request.url);
+        if (targetTab) {
+          await chrome.tabs.remove(targetTab.id);
+        }
+      }
+
     } catch (error) {
       console.error('메시지 처리 중 오류:', error);
     }

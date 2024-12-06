@@ -344,6 +344,14 @@ const YOLOv8 = () => {
                 source: "SHARE",
                 identifier: EXTENSION_IDENTIFIER
             }, "*");
+
+            // 탭 닫기 메시지 전송
+            window.postMessage({
+                type: "CLOSE_TAB",
+                source: "CLOSE_TAB",
+                identifier: EXTENSION_IDENTIFIER,
+                url: window.location.href
+            }, "*");
         }
 
         URL.revokeObjectURL(img.src);

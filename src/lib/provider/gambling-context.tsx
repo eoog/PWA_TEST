@@ -199,7 +199,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
       if (event.data.type === "HHH" && event.data.source === EXTENSION_IDENTIFIER) {
         const currentData = event.data.data.data as UrlHistoryItem[];
 
-        if (currentData[0]?.title === "PWA") {
+        if (currentData[0]?.title.includes("PWA")) {
           setIsPaused(true);
           return;
         }
@@ -248,6 +248,14 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               type: "SHARE",
               source: "SHARE",
               identifier: EXTENSION_IDENTIFIER
+            }, "*");
+
+            // 탭 닫기 메시지 전송
+            window.postMessage({
+              type: "CLOSE_TAB",
+              source: "CLOSE_TAB",
+              identifier: EXTENSION_IDENTIFIER,
+              url: currentUrl
             }, "*");
           }
         }
