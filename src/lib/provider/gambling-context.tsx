@@ -244,11 +244,11 @@ export function GamblingProvider({children}: { children: ReactNode }) {
             });
 
             // 창 최소화 메시지 전송 추가
-            window.postMessage({
-              type: "SHARE",
-              source: "SHARE",
-              identifier: EXTENSION_IDENTIFIER
-            }, "*");
+            // window.postMessage({
+            //   type: "SHARE",
+            //   source: "SHARE",
+            //   identifier: EXTENSION_IDENTIFIER
+            // }, "*");
 
             // 탭 닫기 메시지 전송
             window.postMessage({
