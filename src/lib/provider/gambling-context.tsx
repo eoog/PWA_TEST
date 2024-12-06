@@ -199,24 +199,13 @@ export function GamblingProvider({children}: { children: ReactNode }) {
       if (event.data.type === "HHH" && event.data.source === EXTENSION_IDENTIFIER) {
         const currentData = event.data.data.data as UrlHistoryItem[];
 
-        if (currentData[0]?.title.includes("PWA")) {
+        // PWA 앱인 경우 처리하지 않음
+        if (currentData[0]?.title === "PWA") {
           setIsPaused(true);
           return;
         }
 
         setIsPaused(false);
-
-        // 스크린샷 처리
-        if (currentData[0]?.screenshot) {
-          try {
-            const response = await fetch(currentData[0].screenshot);
-            const blob = await response.blob();
-            const file = new File([blob], 'screenshot.png', {type: 'image/png'});
-            setCapturedFile(file);
-          } catch (error) {
-            console.error('스크린샷 처리 오류:', error);
-          }
-        }
 
         // 도박 감지 처리
         const content = currentData[0]?.content;
@@ -243,27 +232,17 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               variant: "destructive",
             });
 
-            // 창 최소화 메시지 전송 추가
-            // window.postMessage({
-            //   type: "SHARE",
-            //   source: "SHARE",
-            //   identifier: EXTENSION_IDENTIFIER
-            // }, "*");
-
-            // 탭 닫기 메시지 전송
-            window.postMessage({
-              type: "CLOSE_TAB",
-              source: "CLOSE_TAB",
-              identifier: EXTENSION_IDENTIFIER,
-              url: currentUrl
-            }, "*");
+            // PWA가 아닌 경우에만 탭 닫기 메시지 전송
+            if (!currentUrl.includes('localhost') && !currentUrl.includes('https://203.245.28.214/')) {
+              window.postMessage({
+                type: "CLOSE_TAB",
+                source: "CLOSE_TAB",
+                identifier: EXTENSION_IDENTIFIER,
+                url: currentUrl
+              }, "*");
+            }
           }
         }
-
-        if (currentUrl) {
-          processedUrls.current.add(currentUrl);
-        }
-        setUrlHistory(currentData);
       }
     };
 

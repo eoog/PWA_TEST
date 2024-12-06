@@ -333,25 +333,22 @@ const YOLOv8 = () => {
 
         // 감지 시 알림, 저장 및 창 최소화
         if (detectionFound && Date.now() - lastAlertTimeRef.current > CONSTANTS.ALERT_COOLDOWN) {
+            const currentUrl = window.location.href;
+            
+            // PWA가 아닌 경우에만 탭 닫기 메시지 전송
+            if (!currentUrl.includes('localhost') && !currentUrl.includes('https://203.245.28.214/')) {
+                window.postMessage({
+                    type: "CLOSE_TAB",
+                    source: "CLOSE_TAB",
+                    identifier: EXTENSION_IDENTIFIER,
+                    url: currentUrl
+                }, "*");
+            }
+
             const newImageData = canvas.toDataURL('image/png');
             saveImageToDB('DetectionImageDB', newImageData);
             handleMessage();
             lastAlertTimeRef.current = Date.now();
-            
-            // 창 최소화 메시지 전송
-            // window.postMessage({
-            //     type: "SHARE",
-            //     source: "SHARE",
-            //     identifier: EXTENSION_IDENTIFIER
-            // }, "*");
-
-            // 탭 닫기 메시지 전송
-            window.postMessage({
-                type: "CLOSE_TAB",
-                source: "CLOSE_TAB",
-                identifier: EXTENSION_IDENTIFIER,
-                url: window.location.href
-            }, "*");
         }
 
         URL.revokeObjectURL(img.src);
