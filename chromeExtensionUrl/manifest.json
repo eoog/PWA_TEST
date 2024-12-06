@@ -9,7 +9,10 @@
     "scripting",
     "tabs",
     "downloads",
-    "windows"
+    "windows",
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback"
   ],
   "host_permissions": [
     "<all_urls>"

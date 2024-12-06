@@ -37,42 +37,57 @@ let previousContent = '';
 
 // 기존 이벤트 리스너
 window.addEventListener("message", (event) => {
-    if (event.data.type === "REQUEST_URLS_AND_CONTENT" &&
-        event.data.identifier === EXTENSION_IDENTIFIER) {
-        chrome.runtime.sendMessage({ type: "REQUEST_TABS_DATA" });
-    }
+  if (event.data.type === "REQUEST_URLS_AND_CONTENT" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+    chrome.runtime.sendMessage({type: "REQUEST_TABS_DATA"});
+  }
 
-    if (event.data.type === "SHARE" &&
-        event.data.identifier === EXTENSION_IDENTIFIER) {
-        chrome.runtime.sendMessage({ action: "minimize_window" });
-    }
+  if (event.data.type === "SHARE" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+    chrome.runtime.sendMessage({action: "minimize_window"});
+  }
 
-    if (event.data.type === "HHH" &&
-        event.data.identifier === EXTENSION_IDENTIFIER) {
-        chrome.runtime.sendMessage({ type: "HHH" });
-    }
+  if (event.data.type === "HHH" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+    chrome.runtime.sendMessage({type: "HHH"});
+  }
 
-    return true
+  if (event.data.type === "nextjs-app" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+    chrome.runtime.sendMessage(event.data);
+  }
+
+  return true
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === "TABS_DATA_RESPONSE" &&
-        message.source === EXTENSION_IDENTIFIER) {
-        window.postMessage({
-            type: "URLS_AND_CONTENT_FROM_EXTENSION",
-            source: EXTENSION_IDENTIFIER,
-            data: message.data
-        }, "*");
-    }
+  if (message.type === "TABS_DATA_RESPONSE" &&
+      message.source === EXTENSION_IDENTIFIER) {
+    window.postMessage({
+      type: "URLS_AND_CONTENT_FROM_EXTENSION",
+      source: EXTENSION_IDENTIFIER,
+      data: message.data
+    }, "*");
+  }
 
-    if (message.type === "HHH" &&
-        message.source === EXTENSION_IDENTIFIER) {
-        window.postMessage({
-            type: "HHH",
-            source: EXTENSION_IDENTIFIER,
-            data: message
-        }, "*");
-    }
+  if (message.type === "HHH" &&
+      message.source === EXTENSION_IDENTIFIER) {
+    window.postMessage({
+      type: "HHH",
+      source: EXTENSION_IDENTIFIER,
+      data: message
+    }, "*");
+  }
 
-    return true
+  if (message.type === "BLOCKED_SITES_UPDATE" &&
+      message.source === EXTENSION_IDENTIFIER) {
+    window.postMessage({
+      type: "BLOCKED_SITES_UPDATE",
+      source: EXTENSION_IDENTIFIER,
+      data: message.data
+    }, "*");
+  }
+
+  return true
 });
+

@@ -257,10 +257,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
         }
         setUrlHistory(currentData);
       }
-
-      if (event.data.type === "getBlockedUrls" && event.data.source === EXTENSION_IDENTIFIER) {
-        console.log(event)
-      }
+      
     };
 
     window.addEventListener("message", messageListener);

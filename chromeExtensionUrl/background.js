@@ -1,4 +1,6 @@
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
+let blacklist = [];
+let unblockTimer = null;
 
 // 탭에서 컨텐츠와 스크린샷을 추출하는 함수
 async function getTabContentAndScreenshot(tab) {
@@ -7,7 +9,7 @@ async function getTabContentAndScreenshot(tab) {
       target: {tabId: tab.id},
       function: () => document.body.innerText
     });
-    
+
     const screenshot = await chrome.tabs.captureVisibleTab(null, {
       format: 'jpeg',
       quality: 50
@@ -32,7 +34,7 @@ async function collectTabsData() {
     const tabsData = [];
 
     for (const tab of tabs) {
-      const { content, screenshot } = await getTabContentAndScreenshot(tab);
+      const {content, screenshot} = await getTabContentAndScreenshot(tab);
       tabsData.push({
         url: tab.url,
         title: tab.title,
@@ -50,7 +52,7 @@ async function collectTabsData() {
 
 async function HHHURL(tab) {
   try {
-    const { content, screenshot } = await getTabContentAndScreenshot(tab);
+    const {content, screenshot} = await getTabContentAndScreenshot(tab);
     return [{
       url: tab.url,
       title: tab.title,
@@ -71,9 +73,9 @@ async function HHHH() {
     ]);
 
     return allWindows
-      .filter(window => window.id === currentWindow.id)
-      .flatMap(window => window.tabs.filter(tab => tab.active))
-      .map(tab => ({ tab }));
+    .filter(window => window.id === currentWindow.id)
+    .flatMap(window => window.tabs.filter(tab => tab.active))
+    .map(tab => ({tab}));
   } catch (error) {
     console.error('탭 데이터 수집 실패:', error);
     return [];
@@ -121,12 +123,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
       }
 
-       if (request.action === "minimize_window") {
+      if (request.action === "minimize_window") {
         const window = await chrome.windows.getCurrent();
         await chrome.windows.update(window.id, {state: 'minimized'});
       }
-
-
 
       if (request.type === "HHH") {
         const hhhData = await HHHH();
@@ -139,6 +139,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           });
         }
       }
+
+      switch (request.type) {
+        case 'GET_BLOCKED_SITES': {
+          const {blockedSites} = await chrome.storage.sync.get('blockedSites');
+          if (sender.tab?.id) {
+            await chrome.tabs.sendMessage(sender.tab.id, {
+              type: "BLOCKED_SITES_UPDATE",
+              source: EXTENSION_IDENTIFIER,
+              data: blockedSites || []
+            });
+          }
+          break;
+        }
+
+        case 'ADD_BLOCKED_SITE': {
+          const {blockedSites = []} = await chrome.storage.sync.get(
+              'blockedSites');
+          const newSite = request.data.site;
+          if (!blockedSites.includes(newSite)) {
+            const updatedSites = [...blockedSites, newSite];
+            await chrome.storage.sync.set({blockedSites: updatedSites});
+          }
+          break;
+        }
+
+        case 'REMOVE_BLOCKED_SITE': {
+          const {blockedSites = []} = await chrome.storage.sync.get(
+              'blockedSites');
+          const updatedSites = blockedSites.filter(
+              site => site !== request.data.site);
+          await chrome.storage.sync.set({blockedSites: updatedSites});
+          break;
+        }
+      }
     } catch (error) {
       console.error('메시지 처리 중 오류:', error);
     }
@@ -147,3 +181,54 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // 비동기 응답을 사용하지 않으므로 false 반환
   return false;
 });
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const {blockedSites} = await chrome.storage.sync.get('blockedSites');
+  if (!blockedSites) {
+    await chrome.storage.sync.set({blockedSites: []});
+  }
+});
+
+async function updateBlockedSites(blockedSites, unblockAfter = 0) {
+  // 기존 규칙 모두 제거
+  const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
+  const ruleIds = existingRules.map(rule => rule.id);
+
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: ruleIds,
+    addRules: blockedSites.map((site, i) => ({
+      id: i + 1,
+      priority: 1,
+      action: {type: "block"},
+      condition: {
+        urlFilter: `||${site}^`,
+        resourceTypes: ['main_frame']
+      }
+    }))
+  });
+
+  if (unblockAfter > 0) {
+    const unblockTime = Date.now() + unblockAfter * 1000;
+    await chrome.storage.sync.set({unblockTime});
+
+    if (unblockTimer) {
+      clearTimeout(unblockTimer);
+    }
+
+    unblockTimer = setTimeout(async () => {
+      await chrome.storage.sync.remove('unblockTime');
+      await updateBlockedSites([]);
+    }, unblockAfter * 1000);
+  } else {
+    await chrome.storage.sync.remove('unblockTime');
+  }
+}
+
+// Storage 변경 감지
+chrome.storage.onChanged.addListener(async (changes, area) => {
+  if (area === 'sync' && changes.blockedSites?.newValue) {
+    const blockedSites = changes.blockedSites.newValue;
+    await updateBlockedSites(blockedSites, 10);
+  }
+});
+

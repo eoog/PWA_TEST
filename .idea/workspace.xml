@@ -5,12 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c2dfbcf-d02f-42c2-95d9-41c893e2c178" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/content.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/block/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/block/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/background.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/icon-blocked.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/manifest.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/popup.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/popup.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/content.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/provider/gambling-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/provider/gambling-context.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,33 +47,33 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "next",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/workspace/PWA",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.stylelint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.stylelint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "actions.on.save",
-    "ts.external.directory.path": "D:\\next\\pwa\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;next&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/workspace/PWA/src/app/block&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.stylelint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\workspace\\PWA\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\workspace\PWA\src\app\block" />
+      <recent name="C:\workspace\PWA\test" />
       <recent name="C:\workspace\PWA" />
       <recent name="D:\next\pwa\src\app\gambling" />
       <recent name="D:\next\pwa\public" />
-      <recent name="D:\next\pwa\src\app\image" />
-      <recent name="D:\next\pwa\src\app\fonts" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\next\pwa\src\app\image\detection" />
@@ -118,6 +126,9 @@
       <updated>1733300933996</updated>
       <workItem from="1733300935059" duration="3698000" />
       <workItem from="1733354949535" duration="22472000" />
+      <workItem from="1733382395837" duration="7294000" />
+      <workItem from="1733441861606" duration="1225000" />
+      <workItem from="1733443164585" duration="5489000" />
     </task>
     <task id="LOCAL-00001" summary="in">
       <option name="closed" value="true" />
@@ -143,14 +154,51 @@
       <option name="project" value="LOCAL" />
       <updated>1733379149070</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="in">
+      <option name="closed" value="true" />
+      <created>1733382346756</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1733382346756</updated>
+    </task>
+    <task id="LOCAL-00005" summary="DB 수정~">
+      <option name="closed" value="true" />
+      <created>1733390248293</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1733390248293</updated>
+    </task>
+    <task id="LOCAL-00006" summary="init">
+      <option name="closed" value="true" />
+      <created>1733446641166</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1733446641166</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="in" />
-    <option name="LAST_COMMIT_MESSAGE" value="in" />
+    <MESSAGE value="DB 수정~" />
+    <MESSAGE value="init" />
+    <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
 </project>
