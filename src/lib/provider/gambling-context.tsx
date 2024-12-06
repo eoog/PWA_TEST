@@ -199,7 +199,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
       if (event.data.type === "HHH" && event.data.source === EXTENSION_IDENTIFIER) {
         const currentData = event.data.data.data as UrlHistoryItem[];
 
-        if (currentData[0]?.title === "PWA") {
+        if (currentData[0]?.title === "meerCat.ch") {
           setIsPaused(true);
           return;
         }
@@ -221,7 +221,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
         // 도박 감지 처리
         const content = currentData[0]?.content;
         const currentUrl = currentData[0]?.url;
-
+        console.log("Dd")
         if (content && currentUrl && !processedUrls.current.has(currentUrl)) {
           const detector = new GamblingDetector();
           const result = detector.gamble(content, currentUrl);
@@ -234,7 +234,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               detectedAt: new Date(),
               score: result.score
             });
-            
+
             currentData[0].검출유무 = 1;
             sendNotification('inappropriate', '도박성 콘텐츠가 감지되었습니다.');
             toast({
@@ -256,6 +256,10 @@ export function GamblingProvider({children}: { children: ReactNode }) {
           processedUrls.current.add(currentUrl);
         }
         setUrlHistory(currentData);
+      }
+
+      if (event.data.type === "getBlockedUrls" && event.data.source === EXTENSION_IDENTIFIER) {
+        console.log(event)
       }
     };
 
