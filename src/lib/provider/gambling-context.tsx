@@ -315,7 +315,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
             });
 
             currentData[0].검출유무 = 1;
-            sendNotification('inappropriate', '성인 콘텐츠가 감지되었습니다.');
+            sendNotification('inappropriate', '도박 콘텐츠가 감지되었습니다.');
             toast({
               title: "도박성 컨텐츠 감지",
               description: "도박 관련 컨텐츠가 검출되었습니다.",
