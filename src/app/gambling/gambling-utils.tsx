@@ -1,9 +1,15 @@
-export const initDB = () => {
+interface GamblingDB extends IDBDatabase {
+  // 필요한 추가 타입 정의
+}
+
+export const initDB = (): Promise<GamblingDB> => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('GamblingDetectionDB', 1);
 
     request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      resolve(request.result as GamblingDB);
+    };
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
