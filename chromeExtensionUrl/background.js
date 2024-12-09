@@ -469,12 +469,7 @@ const initDB = async () => {
     request.onupgradeneeded = (event) => {
       console.log("Upgrading database...");
       const db = event.target.result;
-
-      // 기존 스토어가 있다면 삭제
-      if (db.objectStoreNames.contains('blockedSites')) {
-        db.deleteObjectStore('blockedSites');
-      }
-
+      
       // 새 스토어 생성
       const store = db.createObjectStore('blockedSites', {
         keyPath: 'url',
