@@ -12,10 +12,14 @@ import {
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 
 interface DetectionImageData {
-  content?: string;
+  id: number;
+  url: string;
+  title: string;
   screenshot: string;
-  title?: string;
-  url?: string;
+  content: string;
+  detectedAt: Date;
+  timestamp: string;
+  score: number;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -54,6 +58,8 @@ export default function DetectionImage() {
       const db = await openDatabase();
       const transaction = db.transaction("detections", "readonly");
       const store = transaction.objectStore("detections");
+
+      // 전체 아이템 수 가져오기
       const count = await new Promise<number>((resolve) => {
         const countRequest = store.count();
         countRequest.onsuccess = () => resolve(countRequest.result);
@@ -61,20 +67,26 @@ export default function DetectionImage() {
 
       setTotalPages(Math.ceil(count / ITEMS_PER_PAGE));
 
-      // Get images for the current page
-      const start = (page - 1) * ITEMS_PER_PAGE;
-      const request = store.getAll(IDBKeyRange.bound(start, start + ITEMS_PER_PAGE - 1));
-
-      const images = await new Promise<DetectionImageData[]>((resolve) => {
+      // 모든 데이터 가져오기
+      const allItems = await new Promise<DetectionImageData[]>((resolve) => {
+        const request = store.getAll();
         request.onsuccess = () => resolve(request.result);
       });
 
-      setImages(images);
+      // 타임스탬프 기준으로 정렬
+      const sortedItems = allItems.sort((a, b) => {
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      });
+
+      // 현재 페이지에 해당하는 아이템들 선택
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const pageItems = sortedItems.slice(start, start + ITEMS_PER_PAGE);
+
+      setImages(pageItems);
     } catch (error) {
       console.error("Error loading images:", error);
     }
   };
-
   useEffect(() => {
     loadImages(currentPage);
   }, [currentPage]);
@@ -110,28 +122,37 @@ export default function DetectionImage() {
           </DialogContent>
         </Dialog>
         <div className="flex flex-1 flex-col gap-4 p-4">
-          <div
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {images.map((image, index) => (
+          <div>
+            {images.length === 0 ? (
                 <div
-                    key={`${image.title}-${index}`}  // index를 추가하여 unique key 생성
-                    className="aspect-square rounded-xl bg-muted/50 overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
-                    onClick={() => image.screenshot && handleImageClick(image.screenshot, '도박 검출 이미지')}
-                >
-                  <div className="relative group h-full w-full">
-                    <img
-                        src={image.screenshot}
-                        alt={`Detection ${index + 1}`}
-                        className="w-full h-full object-cover object-center"
-                        style={{width: "100%", height: "100%"}}
-                    />
-                    <div
-                        className="absolute bottom-2 right-2 text-xs text-foreground/75 bg-background/75 px-2 py-1 rounded">
-                      클릭하여 확대
-                    </div>
-                  </div>
+                    className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
+                  <p>저장된 이미지가 없습니다.</p>
                 </div>
-            ))}
+            ) : (
+                <div
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {images.map((image, index) => (
+                      <div
+                          key={`${image.title}-${index}`}
+                          className="aspect-square rounded-xl bg-muted/50 overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                          onClick={() => image.screenshot && handleImageClick(image.screenshot, '도박 검출 이미지')}
+                      >
+                        <div className="relative group h-full w-full">
+                          <img
+                              src={image.screenshot}
+                              alt={`Detection ${index + 1}`}
+                              className="w-full h-full object-cover object-center"
+                              style={{width: "100%", height: "100%"}}
+                          />
+                          <div
+                              className="absolute bottom-2 right-2 text-xs text-foreground/75 bg-background/75 px-2 py-1 rounded">
+                            클릭하여 확대
+                          </div>
+                        </div>
+                      </div>
+                  ))}
+                </div>
+            )}
           </div>
 
           {totalPages > 1 && (

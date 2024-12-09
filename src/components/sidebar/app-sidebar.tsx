@@ -69,6 +69,18 @@ const data = {
         },
       ],
     },
+    {
+      title: "차단",
+      url: "#",
+      icon: BookOpen,
+      isActive: true,
+      items: [
+        {
+          title: "사이트 차단",
+          url: "/block",
+        },
+      ],
+    },
   ],
 }
 

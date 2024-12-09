@@ -113,6 +113,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
 
   const initDB = async (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
+      // 버전을 2로 올려서 스키마 변경
       const request = indexedDB.open('GamblingDetectionDB', 1);
 
       request.onerror = () => reject(request.error);
@@ -120,11 +121,18 @@ export function GamblingProvider({children}: { children: ReactNode }) {
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains('detections')) {
-          const store = db.createObjectStore('detections', {keyPath: 'id', autoIncrement: true});
-          store.createIndex('url', 'url', {unique: true});
-          store.createIndex('timestamp', 'timestamp', {unique: false});
-        }
+
+        // 새로운 스토어 생성
+        const store = db.createObjectStore('detections', {
+          keyPath: 'id',
+          autoIncrement: true
+        });
+
+        // 인덱스 생성 - unique 제약 조건 제거
+        store.createIndex('url', 'url', {unique: false});
+        store.createIndex('detectedAt', 'detectedAt', {unique: false});
+        store.createIndex('title', 'title', {unique: false});
+        store.createIndex('score', 'score', {unique: false});
       };
     });
   };
@@ -170,7 +178,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
           notification.close();
         };
 
-        setTimeout(() => notification.close(), 5000);
+        setTimeout(() => notification.close(), 3000);
       } catch (error) {
         console.error('알림 생성 실패:', error);
       }
@@ -182,27 +190,35 @@ export function GamblingProvider({children}: { children: ReactNode }) {
   const saveDetection = async (detection: Omit<DetectionItem, 'id'>): Promise<number> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction('detections', 'readwrite');
-      const store = transaction.objectStore('detections');
-      const request = store.add({
-        ...detection,
-        timestamp: new Date().toISOString()
-      });
+      try {
+        const transaction = db.transaction('detections', 'readwrite');
+        const store = transaction.objectStore('detections');
 
-      request.onsuccess = () => resolve(request.result as number);
-      request.onerror = () => reject(request.error);
+        // timestamp와 함께 데이터 저장
+        const request = store.add({
+          ...detection,
+          timestamp: new Date().toISOString(),
+          id: Date.now() // 고유한 ID 생성
+        });
+
+        request.onsuccess = () => resolve(request.result as number);
+        request.onerror = () => reject(request.error);
+      } catch (error) {
+        console.error('저장 오류:', error);
+        reject(error);
+      }
     });
   };
-
   useEffect(() => {
     const messageListener = async (event: MessageEvent) => {
       if (event.data.type === "HHH" && event.data.source === EXTENSION_IDENTIFIER) {
         const currentData = event.data.data.data as UrlHistoryItem[];
 
-        if (currentData[0]?.title === "PWA") {
+        if (currentData[0]?.title === "meerCat.ch") {
           setIsPaused(true);
           return;
         }
+
 
         setIsPaused(false);
 
@@ -222,8 +238,11 @@ export function GamblingProvider({children}: { children: ReactNode }) {
         const content = currentData[0]?.content;
         const currentUrl = currentData[0]?.url;
 
+        console.log("ㅋㅋ")
 
-        if (content && currentUrl && !processedUrls.current.has(currentUrl)) {
+        // if (content && currentUrl && !processedUrls.current.has(currentUrl)) {
+
+        if (content) {
           const detector = new GamblingDetector();
           const result = detector.gamble(content, currentUrl);
           if (result.result !== "통과") {
@@ -235,7 +254,8 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               detectedAt: new Date(),
               score: result.score
             });
-            
+
+
             currentData[0].검출유무 = 1;
             sendNotification('inappropriate', '성인 콘텐츠가 감지되었습니다.');
             toast({
@@ -243,6 +263,18 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               description: "도박 관련 컨텐츠가 검출되었습니다.",
               variant: "destructive",
             });
+
+            window.postMessage(
+                {
+                  type: "block",
+                  source: "block",
+                  identifier: EXTENSION_IDENTIFIER,
+                  data: currentData[0].url,
+                  duration: '10'
+                },
+                "*"
+            );
+
           }
         }
 
@@ -265,6 +297,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
           "*"
       );
     };
+
 
     requestData();
     const intervalId = setInterval(requestData, 1000);
