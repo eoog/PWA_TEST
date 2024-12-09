@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "URL Content Tracker",
+  "name": "URL Content Tracker!!!",
   "version": "1.0",
   "description": "열린 탭과 그 내용을 추적합니다",
   "permissions": [
@@ -10,8 +10,7 @@
     "tabs",
     "downloads",
     "windows",
-    "declarativeNetRequest",
-    "storage"
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "<all_urls>",

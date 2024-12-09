@@ -55,7 +55,7 @@ window.addEventListener("message", (event) => {
   if (event.data.type === "block" &&
       event.data.identifier === EXTENSION_IDENTIFIER) {
     chrome.runtime.sendMessage(
-        {type: "block", data: event.data.data, duration: event.duration});
+        {type: "block", data: event.data.data, duration: event.data.duration});
   }
 
   // unblock 리스너 추가

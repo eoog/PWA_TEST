@@ -36,7 +36,7 @@ export default function BlockedSitesList() {
   const form = useForm<BlockSiteFormData>({
     defaultValues: {
       url: "",
-      duration: 10
+      duration: 1
     }
   });
 
@@ -191,11 +191,44 @@ export default function BlockedSitesList() {
     console.log("Component mounted");
     loadBlockedSites();
 
-    // 주기적 업데이트
+    // 10초마다 만료된 차단 확인 및 삭제
+    const checkExpiredSites = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction('blockedSites', 'readwrite');
+        const store = transaction.objectStore('blockedSites');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          const currentTime = new Date();
+          const sites = request.result;
+
+          sites.forEach(async (site) => {
+            if (site.unblockTime && new Date(site.unblockTime) <= currentTime) {
+              console.log('Expired site found:', site.url);
+              // DB에서 삭제
+              await store.delete(site.url);
+              // 차단 해제 메시지 전송
+              window.postMessage({
+                type: "unblock",
+                source: "unblock",
+                identifier: EXTENSION_IDENTIFIER,
+                data: site.url
+              }, "*");
+            }
+          });
+        };
+      } catch (error) {
+        console.error('Error checking expired sites:', error);
+      }
+    };
+
+    // 10초마다 실행되는 인터벌
     const interval = setInterval(() => {
-      console.log("Updating blocked sites list...");
-      loadBlockedSites();
-    }, 1000);
+      console.log("Checking expired sites...");
+      checkExpiredSites();
+      loadBlockedSites(); // 목록 새로고침
+    }, 3000);
 
     return () => {
       console.log("Cleaning up interval");
