@@ -356,11 +356,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           success = await updateBlockedSites([request.data], durationInSeconds);
           console.log('Block operation result:', success);
 
-          await chrome.tabs.sendMessage(sender.tab.id, {
-            type: "block",
-            source: EXTENSION_IDENTIFIER,
-            data: success
+          // 모든 탭을 조회하여 특정 URL을 가진 탭 찾기
+          const tabs = await chrome.tabs.query({});
+          const targetUrl = request.data; // 차단된 URL
+
+          // URL이 일치하는 모든 탭을 새로고침
+          tabs.forEach(tab => {
+            if (tab.url.includes(targetUrl)) {
+              chrome.tabs.reload(tab.id);
+            }
           });
+
         } catch (error) {
           console.error('Error in block handler:', error);
         }
@@ -469,7 +475,7 @@ const initDB = async () => {
     request.onupgradeneeded = (event) => {
       console.log("Upgrading database...");
       const db = event.target.result;
-      
+
       // 새 스토어 생성
       const store = db.createObjectStore('blockedSites', {
         keyPath: 'url',

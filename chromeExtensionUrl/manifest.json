@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "URL Content Tracker",
-  "version": "2.0",
+  "name": "URL Content Tracker!!!",
+  "version": "1.0",
   "description": "열린 탭과 그 내용을 추적합니다",
   "permissions": [
     "activeTab",
