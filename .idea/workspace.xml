@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7c2dfbcf-d02f-42c2-95d9-41c893e2c178" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +123,7 @@
       <workItem from="1733300935059" duration="3698000" />
       <workItem from="1733354949535" duration="22472000" />
       <workItem from="1733465086000" duration="6219000" />
-      <workItem from="1733700499713" duration="11335000" />
+      <workItem from="1733700499713" duration="11599000" />
     </task>
     <task id="LOCAL-00001" summary="in">
       <option name="closed" value="true" />
@@ -165,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733710519980</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="in">
+      <option name="closed" value="true" />
+      <created>1733712090075</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1733712090075</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
