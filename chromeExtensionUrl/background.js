@@ -220,8 +220,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const params = new URLSearchParams(new URL(currentUrl).search);
             const targetUrl = params.get('uri');
 
-            console.log('Target URL to unblock:', targetUrl);
-
             if (targetUrl) {
               const unblocked = await unblockCurrentSite(targetUrl);
               if (unblocked) {
@@ -229,6 +227,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                   try {
                     const currentTabId = sender.tab.id;
                     await chrome.tabs.remove(currentTabId);
+
+                    const hhhData = await HHHH();
+
+                    console.log(hhhData)
 
                     // IndexedDB에서 해당 사이트 정보 제거
                     const db = await initDB();
@@ -238,7 +240,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                     request.onsuccess = () => {
                       console.log('Blocked site removed from IndexedDB:',
-                          targetUrl);
+                          result[0].url);
                     };
 
                     request.onerror = () => {
@@ -278,12 +280,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
 
       if (request.type === "block") {
-        console.log(request)
+
         success = await updateBlockedSites([request.data],
             request.duration || 0);
-        await chrome.tabs.update(sender.tab.id, {
-          reload: true
-        });
+
         await chrome.tabs.sendMessage(sender.tab.id, {
           type: "block",
           source: EXTENSION_IDENTIFIER,
