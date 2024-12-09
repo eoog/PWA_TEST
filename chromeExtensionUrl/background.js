@@ -147,17 +147,17 @@ async function unblockCurrentSite(targetUrl) {
   }
 }
 
-async function updateBlockedSites(blockedSites, unblockAfter = 0) {
+async function updateBlockedSites(blockedSites, unblockAfter) {
   try {
-    // 기존 규칙 가져오기
+    console.log('Starting updateBlockedSites:', {blockedSites, unblockAfter});
+
+    // 규칙 추가
     const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
     const existingIds = existingRules.map(rule => rule.id);
-
-    // 새 규칙 ID는 기존 ID의 최대값 + 1부터 시작
     let nextId = Math.max(0, ...existingIds) + 1;
 
     await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [], // 기존 규칙은 유지
+      removeRuleIds: [],
       addRules: blockedSites.map((site) => ({
         id: nextId++,
         priority: 1,
@@ -175,22 +175,57 @@ async function updateBlockedSites(blockedSites, unblockAfter = 0) {
       }))
     });
 
-    if (unblockAfter > 0) {
-      if (unblockTimer) {
-        clearTimeout(unblockTimer);
+    // DB에 차단 정보 저장
+    const db = await initDB();
+    const transaction = db.transaction('blockedSites', 'readwrite');
+    const store = transaction.objectStore('blockedSites');
+
+    // 타이머 설정 로직
+    if (unblockAfter && unblockAfter > 0) {
+      for (const site of blockedSites) {
+        const unblockTime = new Date(Date.now() + unblockAfter * 1000);
+        const blockedSite = {
+          url: site,
+          blockedAt: new Date(),
+          unblockTime: unblockTime,
+          duration: unblockAfter
+        };
+        await store.put(blockedSite);
+
+        // 각 사이트별로 별도의 타이머 설정
+        setTimeout(async () => {
+          try {
+            console.log(`Timer expired for ${site}, unblocking...`);
+            await unblockCurrentSite(site);
+
+            // DB에서 삭제
+            const db = await initDB();
+            const tx = db.transaction('blockedSites', 'readwrite');
+            const store = tx.objectStore('blockedSites');
+            await store.delete(site);
+
+            console.log(`Site ${site} unblocked successfully`);
+          } catch (error) {
+            console.error(`Error unblocking site ${site}:`, error);
+          }
+        }, unblockAfter * 1000);
       }
-
-      unblockTimer = setTimeout(async () => {
-        // 해당 URL만 해제
-        await unblockCurrentSite(blockedSites[0]);
-      }, unblockAfter * 1000);
-
-      return true;
+    } else {
+      // 영구 차단의 경우
+      for (const site of blockedSites) {
+        const blockedSite = {
+          url: site,
+          blockedAt: new Date(),
+          unblockTime: undefined,
+          duration: 0
+        };
+        await store.put(blockedSite);
+      }
     }
 
-    return blockedSites.length > 0;
+    return true;
   } catch (error) {
-    console.error('Error updating blocked sites:', error);
+    console.error('Error in updateBlockedSites:', error);
     return false;
   }
 }
@@ -221,48 +256,76 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const targetUrl = params.get('uri');
 
             if (targetUrl) {
-              const unblocked = await unblockCurrentSite(targetUrl);
-              if (unblocked) {
-                setTimeout(async () => {
+              // DB 작업을 Promise로 래핑
+              const deleteFromDB = (url) => new Promise((resolve, reject) => {
+                const deleteDB = async () => {
                   try {
-                    const currentTabId = sender.tab.id;
-                    await chrome.tabs.remove(currentTabId);
-
-                    const hhhData = await HHHH();
-
-                    console.log(hhhData)
-
-                    // IndexedDB에서 해당 사이트 정보 제거
                     const db = await initDB();
                     const tx = db.transaction('blockedSites', 'readwrite');
                     const store = tx.objectStore('blockedSites');
-                    const request = store.delete(targetUrl);
 
-                    request.onsuccess = () => {
-                      console.log('Blocked site removed from IndexedDB:',
-                          result[0].url);
-                    };
-
-                    request.onerror = () => {
-                      console.error(
-                          'Error removing blocked site from IndexedDB:',
-                          request.error);
-                    };
-
-                    await tx.complete;
-                    // 새로운 탭 생성
-                    const newTab = await chrome.tabs.create({
-                      url: decodeURIComponent(targetUrl)
+                    // 저장된 키 확인
+                    const allKeys = await new Promise((resolve, reject) => {
+                      const request = store.getAllKeys();
+                      request.onsuccess = () => resolve(request.result);
+                      request.onerror = () => reject(request.error);
                     });
 
-                    // 현재 탭 닫기
-                    sendResponse(
-                        {success: true, url: targetUrl});
-                  } catch (err) {
-                    console.error('Navigation error:', err);
-                    sendResponse({success: false, error: 'Navigation failed'});
+                    console.log('Stored keys:', allKeys);
+                    console.log('Target URL:', url);
+
+                    // 일치하는 키 찾기
+                    const matchingKey = allKeys.find(key => key === url);
+
+                    if (matchingKey) {
+                      console.log('Found matching key:', matchingKey);
+                      const deleteRequest = store.delete(matchingKey);
+
+                      await new Promise((resolve, reject) => {
+                        deleteRequest.onsuccess = () => {
+                          console.log('Successfully deleted key:', matchingKey);
+                          resolve();
+                        };
+                        deleteRequest.onerror = () => {
+                          console.error('Failed to delete:',
+                              deleteRequest.error);
+                          reject(deleteRequest.error);
+                        };
+                      });
+
+                      await tx.complete;
+                      resolve();
+                    } else {
+                      console.log('No matching key found');
+                      resolve();
+                    }
+                  } catch (error) {
+                    console.error('Delete operation failed:', error);
+                    reject(error);
                   }
-                }, 100); // 약간의 지연을 추가
+                };
+                deleteDB();
+              });
+
+              const unblocked = await unblockCurrentSite(targetUrl);
+              if (unblocked) {
+                try {
+                  const decodedUrl = decodeURIComponent(targetUrl);
+
+                  // DB에서 삭제
+                  console.log("d==========================", targetUrl)
+                  await deleteFromDB(targetUrl);
+                  console.log('DB deletion completed');
+
+                  // 현재 탭 닫고 새 탭 열기
+                  await chrome.tabs.remove(sender.tab.id);
+                  await chrome.tabs.create({url: decodedUrl});
+
+                  sendResponse({success: true});
+                } catch (error) {
+                  console.error('Error during unblock process:', error);
+                  sendResponse({success: false, error: error.message});
+                }
               } else {
                 sendResponse({success: false, error: 'Unblock failed'});
               }
@@ -276,19 +339,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.error('Password check error:', error);
           sendResponse({success: false, error: error.message});
         }
-        return true;
+        return true;  // 비동기 응답을 위해 true 반환
       }
 
+      // block 메시지 처리 부분도 수정
       if (request.type === "block") {
+        console.log('Received block request:', request);
+        const duration = parseInt(request.duration) || 0;
+        console.log('Duration in minutes:', duration);
 
-        success = await updateBlockedSites([request.data],
-            request.duration || 0);
+        // 분을 초로 변환
+        const durationInSeconds = duration * 60;
+        console.log('Duration in seconds:', durationInSeconds);
 
-        await chrome.tabs.sendMessage(sender.tab.id, {
-          type: "block",
-          source: EXTENSION_IDENTIFIER,
-          data: success
-        });
+        try {
+          success = await updateBlockedSites([request.data], durationInSeconds);
+          console.log('Block operation result:', success);
+
+          await chrome.tabs.sendMessage(sender.tab.id, {
+            type: "block",
+            source: EXTENSION_IDENTIFIER,
+            data: success
+          });
+        } catch (error) {
+          console.error('Error in block handler:', error);
+        }
       }
 
       if (request.type === "unblock") {

@@ -314,9 +314,6 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               score: result.score
             });
 
-            // BlockedSitesDB에도 저장
-            await saveToBlockedSitesDB(currentData[0].url, 10); // 10분 차단
-
             currentData[0].검출유무 = 1;
             sendNotification('inappropriate', '성인 콘텐츠가 감지되었습니다.');
             toast({
@@ -331,10 +328,13 @@ export function GamblingProvider({children}: { children: ReactNode }) {
                   source: "block",
                   identifier: EXTENSION_IDENTIFIER,
                   data: currentData[0].url,
-                  duration: '10'
+                  duration: '1'
                 },
                 "*"
             );
+
+            // BlockedSitesDB에도 저장
+            await saveToBlockedSitesDB(currentData[0].url, 1); // 10분 차단
 
 
           }
