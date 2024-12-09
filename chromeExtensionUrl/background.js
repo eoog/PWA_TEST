@@ -119,8 +119,8 @@ async function unblockCurrentSite(targetUrl) {
     const decodedUrl = decodeURIComponent(targetUrl).toLowerCase();
     console.log('Trying to unblock:', decodedUrl);
 
-    // 특정 URL에 해당하는 규칙만 찾아서 제거
-    const ruleToRemove = rules.find(rule => {
+    // 특정 URL에 해당하는 규칙을 모두 찾음
+    const rulesToRemove = rules.filter(rule => {
       if (rule.condition.urlFilter) {
         const ruleUrl = decodeURIComponent(
             rule.condition.urlFilter).toLowerCase();
@@ -129,16 +129,17 @@ async function unblockCurrentSite(targetUrl) {
       return false;
     });
 
-    if (ruleToRemove) {
-      // 해당 규칙만 제거
+    if (rulesToRemove.length > 0) {
+      // 해당 규칙들의 ID를 추출하여 제거
+      const ruleIdsToRemove = rulesToRemove.map(rule => rule.id);
       await chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: [ruleToRemove.id]
+        removeRuleIds: ruleIdsToRemove
       });
-      console.log('Specific rule removed for:', decodedUrl);
+      console.log('Specific rules removed for:', decodedUrl);
       return true;
     }
 
-    console.log('No matching rule found for:', decodedUrl);
+    console.log('No matching rules found for:', decodedUrl);
     return false;
   } catch (error) {
     console.error('Unblock error:', error);
@@ -226,10 +227,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               if (unblocked) {
                 setTimeout(async () => {
                   try {
-                    await chrome.tabs.update(sender.tab.id, {
+                    const currentTabId = sender.tab.id;
+                    await chrome.tabs.remove(currentTabId);
+
+                    // IndexedDB에서 해당 사이트 정보 제거
+                    const db = await initDB();
+                    const tx = db.transaction('blockedSites', 'readwrite');
+                    const store = tx.objectStore('blockedSites');
+                    const request = store.delete(targetUrl);
+
+                    request.onsuccess = () => {
+                      console.log('Blocked site removed from IndexedDB:',
+                          targetUrl);
+                    };
+
+                    request.onerror = () => {
+                      console.error(
+                          'Error removing blocked site from IndexedDB:',
+                          request.error);
+                    };
+
+                    await tx.complete;
+                    // 새로운 탭 생성
+                    const newTab = await chrome.tabs.create({
                       url: decodeURIComponent(targetUrl)
                     });
-                    sendResponse({success: true});
+
+                    // 현재 탭 닫기
+                    sendResponse(
+                        {success: true, url: targetUrl});
                   } catch (err) {
                     console.error('Navigation error:', err);
                     sendResponse({success: false, error: 'Navigation failed'});
@@ -255,19 +281,62 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log(request)
         success = await updateBlockedSites([request.data],
             request.duration || 0);
+        await chrome.tabs.update(sender.tab.id, {
+          reload: true
+        });
         await chrome.tabs.sendMessage(sender.tab.id, {
           type: "block",
           source: EXTENSION_IDENTIFIER,
           data: success
         });
       }
+
       if (request.type === "unblock") {
         try {
-          await updateBlockedSites([]);
-          if (unblockTimer) {
-            clearTimeout(unblockTimer);
+          console.log('Unblock request for:', request.data);
+
+          // 현재 규칙들 가져오기
+          const rules = await chrome.declarativeNetRequest.getDynamicRules();
+
+          // request.data가 배열이 아니면 배열로 변환
+          const urlsToUnblock = Array.isArray(request.data) ? request.data
+              : [request.data];
+
+          // 중복 URL 제거
+          const uniqueUrls = [...new Set(
+              urlsToUnblock.map(url => url.toLowerCase()))];
+          console.log('Unique URLs to unblock:', uniqueUrls);
+
+          // 제거할 규칙 ID들 수집
+          const ruleIdsToRemove = rules.filter(rule => {
+            if (rule.condition.urlFilter) {
+              const ruleUrl = rule.condition.urlFilter.toLowerCase();
+              return uniqueUrls.some(targetUrl =>
+                  ruleUrl.includes(targetUrl) || targetUrl.includes(ruleUrl)
+              );
+            }
+            return false;
+          }).map(rule => rule.id);
+
+          if (ruleIdsToRemove.length > 0) {
+            // 해당하는 모든 규칙 제거
+            await chrome.declarativeNetRequest.updateDynamicRules({
+              removeRuleIds: ruleIdsToRemove
+            });
+
+            // 타이머 정리
+            if (unblockTimer) {
+              clearTimeout(unblockTimer);
+              unblockTimer = null;
+            }
+
+            console.log('Rules removed for:', uniqueUrls);
+            console.log('Removed rule IDs:', ruleIdsToRemove);
+            sendResponse({success: true});
+          } else {
+            console.log('No matching rules found for:', uniqueUrls);
+            sendResponse({success: false, error: 'No matching rules found'});
           }
-          sendResponse({success: true});
         } catch (error) {
           console.error('Error in unblock handler:', error);
           sendResponse({success: false, error: error.message});
@@ -307,3 +376,42 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // 비동기 응답을 사용하지 않으므로 false 반환
   return false;
 });
+
+const initDB = async () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('BlockedSitesDB', 1);
+
+    request.onerror = () => {
+      console.error("DB Error:", request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      console.log("DB Opened successfully");
+      resolve(request.result);
+    };
+
+    request.onupgradeneeded = (event) => {
+      console.log("Upgrading database...");
+      const db = event.target.result;
+
+      // 기존 스토어가 있다면 삭제
+      if (db.objectStoreNames.contains('blockedSites')) {
+        db.deleteObjectStore('blockedSites');
+      }
+
+      // 새 스토어 생성
+      const store = db.createObjectStore('blockedSites', {
+        keyPath: 'url',
+        autoIncrement: false
+      });
+
+      // 인덱스 생성
+      store.createIndex('blockedAt', 'blockedAt', {unique: false});
+      store.createIndex('unblockTime', 'unblockTime', {unique: false});
+      store.createIndex('duration', 'duration', {unique: false});
+
+      console.log("Store created:", store);
+    };
+  });
+};

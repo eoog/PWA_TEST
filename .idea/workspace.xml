@@ -5,18 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c2dfbcf-d02f-42c2-95d9-41c893e2c178" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/blocked.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/blocked.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/content.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chromeExtensionUrl/popup.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/block/layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/block/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/image/gambling/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/image/gambling/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/sidebar/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/background.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/blocked.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/blocked.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromeExtensionUrl/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/chromeExtensionUrl/content.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/block/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/block/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/provider/gambling-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/provider/gambling-context.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -134,7 +129,7 @@
       <workItem from="1733300935059" duration="3698000" />
       <workItem from="1733354949535" duration="22472000" />
       <workItem from="1733465086000" duration="6219000" />
-      <workItem from="1733700499713" duration="3817000" />
+      <workItem from="1733700499713" duration="9702000" />
     </task>
     <task id="LOCAL-00001" summary="in">
       <option name="closed" value="true" />
@@ -160,7 +155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733379149070</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="in">
+      <option name="closed" value="true" />
+      <created>1733704482202</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1733704482202</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

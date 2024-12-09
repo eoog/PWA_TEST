@@ -1,108 +1,296 @@
 "use client"
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {Clock, Unlock} from 'lucide-react';
+import {Input} from "@/components/ui/input"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
+import {useForm} from "react-hook-form"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const EXTENSION_IDENTIFIER = 'URL_HISTORY_TRACKER_f7e8d9c6b5a4';
 
-// Extension과 통신하는 함수
-const sendMessageToExtension = (type: string, data?: any) => {
-  window.postMessage({
-    type: "block",
-    source: EXTENSION_IDENTIFIER,
-    data: data
-  }, "*");
-};
+interface BlockedSite {
+  url: string;
+  blockedAt: Date;
+  unblockTime?: Date;
+  duration: number;
+}
 
-const SiteBlocker = () => {
-  const [blockedSites, setBlockedSites] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
+interface BlockSiteFormData {
+  url: string;
+  duration: number;
+}
 
-  useEffect(() => {
-    const messageHandler = (event: MessageEvent) => {
-      if (event.source !== window) return;
-      if (!event.data || event.data.source !== EXTENSION_IDENTIFIER) return;
+export default function BlockedSitesList() {
+  const [blockedSites, setBlockedSites] = useState<BlockedSite[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-      if (event.data.type === "BLOCKED_SITES_UPDATE") {
-        setBlockedSites(event.data.data || []);
-      }
-    };
+  const form = useForm<BlockSiteFormData>({
+    defaultValues: {
+      url: "",
+      duration: 10
+    }
+  });
 
-    window.addEventListener('message', messageHandler);
+  const initDB = async (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('BlockedSitesDB', 1); // 버전을 2로 증가
 
-    // 초기 차단된 사이트 목록 요청
-    sendMessageToExtension('GET_BLOCKED_SITES');
+      request.onerror = () => {
+        console.error("DB Error:", request.error);
+        reject(request.error);
+      };
 
-    // 주기적으로 업데이트 요청
-    const intervalId = setInterval(() => {
-      sendMessageToExtension('GET_BLOCKED_SITES');
-    }, 1000);
+      request.onsuccess = () => {
+        console.log("DB Opened successfully");
+        resolve(request.result);
+      };
 
-    return () => {
-      window.removeEventListener('message', messageHandler);
-      clearInterval(intervalId);
-    };
-  }, []);
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        console.log("Upgrading database...");
+        const db = (event.target as IDBOpenDBRequest).result;
 
-  const handleAddSite = () => {
-    if (!inputValue) return;
+        // 기존 스토어가 있다면 삭제
+        if (db.objectStoreNames.contains('blockedSites')) {
+          db.deleteObjectStore('blockedSites');
+        }
 
+        // 새 스토어 생성
+        const store = db.createObjectStore('blockedSites', {
+          keyPath: 'url',
+          autoIncrement: false
+        });
+
+        // 인덱스 생성
+        store.createIndex('blockedAt', 'blockedAt', {unique: false});
+        store.createIndex('unblockTime', 'unblockTime', {unique: false});
+        store.createIndex('duration', 'duration', {unique: false});
+
+        console.log("Store created:", store);
+      };
+    });
+  };
+
+
+  const blockSite = async (url: string, duration: number) => {
     try {
-      let domain = inputValue;
-      if (domain.startsWith('http://') || domain.startsWith('https://')) {
-        domain = new URL(domain).hostname;
-      }
+      console.log("Blocking site:", url, "duration:", duration);
 
-      sendMessageToExtension('ADD_BLOCKED_SITE', {site: domain});
-      setInputValue('');
+      // 확장프로그램에 메시지 전송
+      window.postMessage({
+        type: "block",
+        source: "block",
+        identifier: EXTENSION_IDENTIFIER,
+        data: url,
+        duration: duration
+      }, "*");
+
+      const db = await initDB();
+      const transaction = db.transaction('blockedSites', 'readwrite');
+      const store = transaction.objectStore('blockedSites');
+
+      const blockedSite: BlockedSite = {
+        url,
+        blockedAt: new Date(),
+        unblockTime: duration > 0 ? new Date(Date.now() + duration * 60 * 1000) : undefined,
+        duration
+      };
+
+      return new Promise<void>((resolve, reject) => {
+        const request = store.put(blockedSite);
+
+        request.onerror = () => {
+          console.error("Block error:", request.error);
+          reject(request.error);
+        };
+
+        request.onsuccess = () => {
+          console.log("Site blocked successfully:", blockedSite);
+          loadBlockedSites();
+          resolve();
+        };
+      });
     } catch (error) {
-      alert('올바른 URL 형식이 아닙니다.');
+      console.error('Error blocking site:', error);
     }
   };
 
-  const handleRemoveSite = (site: string) => {
-    sendMessageToExtension('REMOVE_BLOCKED_SITE', {site});
+  const unblockSite = async (url: string) => {
+    try {
+      window.postMessage({
+        type: "unblock",
+        source: "unblock",
+        identifier: EXTENSION_IDENTIFIER,
+        data: url
+      }, "*");
+
+      const db = await initDB();
+      const transaction = db.transaction('blockedSites', 'readwrite');
+      const store = transaction.objectStore('blockedSites');
+      await store.delete(url);
+      loadBlockedSites();
+    } catch (error) {
+      console.error('Error unblocking site:', error);
+    }
   };
 
+  const loadBlockedSites = async () => {
+    try {
+      console.log("Loading blocked sites...");
+      const db = await initDB();
+      const transaction = db.transaction('blockedSites', 'readonly');
+      const store = transaction.objectStore('blockedSites');
+
+      return new Promise<void>((resolve, reject) => {
+        const request = store.getAll();
+
+        request.onerror = () => {
+          console.error("Load error:", request.error);
+          reject(request.error);
+        };
+
+        request.onsuccess = () => {
+          console.log("Raw data loaded:", request.result);
+          const sites = request.result.map(site => ({
+            ...site,
+            blockedAt: new Date(site.blockedAt),
+            unblockTime: site.unblockTime ? new Date(site.unblockTime) : undefined
+          }));
+          console.log("Processed sites:", sites);
+          setBlockedSites(sites);
+          resolve();
+        };
+      });
+    } catch (error) {
+      console.error('Error loading blocked sites:', error);
+    }
+  };
+
+  const truncateUrl = (url: string) => {
+    if (url.length > 100) {
+      return url.substring(0, 100) + '...';
+    }
+    return url;
+  };
+
+  const onSubmit = async (data: BlockSiteFormData) => {
+    await blockSite(data.url, data.duration);
+    setIsDialogOpen(false);
+    form.reset();
+  };
+
+  useEffect(() => {
+    console.log("Component mounted");
+    loadBlockedSites();
+
+    // 주기적 업데이트
+    const interval = setInterval(() => {
+      console.log("Updating blocked sites list...");
+      loadBlockedSites();
+    }, 1000);
+
+    return () => {
+      console.log("Cleaning up interval");
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
-      <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">사이트 차단 관리</h1>
-
-        <div className="mb-4 space-y-2">
-          <div className="flex gap-2">
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddSite()}
-                className="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="차단할 사이트 입력 (예: youtube.com)"
-            />
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold">차단된 사이트 관리</h2>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>사이트 차단</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>새 사이트 차단</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="url"
+                        render={({field}) => (
+                            <FormItem>
+                              <FormLabel>URL</FormLabel>
+                              <FormControl>
+                                <Input placeholder="example.com" {...field} />
+                              </FormControl>
+                              <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="duration"
+                        render={({field}) => (
+                            <FormItem>
+                              <FormLabel>차단 시간 (분)</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field}
+                                       onChange={e => field.onChange(parseInt(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit">차단하기</Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
-          <button
-              onClick={handleAddSite}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600
-                   transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            차단 추가 (10초)
-          </button>
-        </div>
-
-        <ul className="space-y-2">
-          {blockedSites.map((site) => (
-              <li key={site}
-                  className="flex justify-between items-center border p-3 rounded hover:bg-gray-50">
-                <span className="text-gray-700">{site}</span>
-                <button
-                    onClick={() => handleRemoveSite(site)}
-                    className="text-red-500 hover:text-red-700 transition-colors duration-200
-                       focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1"
-                >
-                  삭제
-                </button>
-              </li>
-          ))}
-        </ul>
-      </div>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[400px]">
+            <div className="space-y-4">
+              {blockedSites.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    차단된 사이트가 없습니다
+                  </div>
+              ) : (
+                  blockedSites.map((site) => (
+                      <div key={site.url}
+                           className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                        <div className="flex-1">
+                          <p className="font-medium">{truncateUrl(site.url)}</p>
+                          <div className="flex items-center text-sm text-muted-foreground mt-1">
+                            <Clock className="w-4 h-4 mr-1"/>
+                            차단 시간: {site.blockedAt.toLocaleString()}
+                            {site.unblockTime && (
+                                <span className="ml-2">
+                         (해제 예정: {site.unblockTime.toLocaleString()})
+                       </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => unblockSite(site.url)}
+                          >
+                            <Unlock className="w-4 h-4"/>
+                          </Button>
+                        </div>
+                      </div>
+                  ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
   );
-};
-
-export default SiteBlocker;
+}

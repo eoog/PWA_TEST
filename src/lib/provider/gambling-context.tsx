@@ -111,6 +111,45 @@ export function GamblingProvider({children}: { children: ReactNode }) {
     }
   }
 
+  const initBlcokDB = async (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('BlockedSitesDB', 1); // 버전을 2로 증가
+
+      request.onerror = () => {
+        console.error("DB Error:", request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        console.log("DB Opened successfully");
+        resolve(request.result);
+      };
+
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        console.log("Upgrading database...");
+        const db = (event.target as IDBOpenDBRequest).result;
+
+        // 기존 스토어가 있다면 삭제
+        if (db.objectStoreNames.contains('blockedSites')) {
+          db.deleteObjectStore('blockedSites');
+        }
+
+        // 새 스토어 생성
+        const store = db.createObjectStore('blockedSites', {
+          keyPath: 'url',
+          autoIncrement: false
+        });
+
+        // 인덱스 생성
+        store.createIndex('blockedAt', 'blockedAt', {unique: false});
+        store.createIndex('unblockTime', 'unblockTime', {unique: false});
+        store.createIndex('duration', 'duration', {unique: false});
+
+        console.log("Store created:", store);
+      };
+    });
+  };
+
   const initDB = async (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
       // 버전을 2로 올려서 스키마 변경
@@ -186,6 +225,26 @@ export function GamblingProvider({children}: { children: ReactNode }) {
     }
   };
 
+  const saveToBlockedSitesDB = async (url: string, duration: number) => {
+    try {
+      const db = await initBlcokDB();
+      const transaction = db.transaction('blockedSites', 'readwrite');
+      const store = transaction.objectStore('blockedSites');
+
+      const blockedSite = {
+        url,
+        blockedAt: new Date(),
+        unblockTime: new Date(Date.now() + duration * 60 * 1000),
+        duration: duration
+      };
+
+      await store.put(blockedSite);
+      console.log('Site saved to BlockedSitesDB:', blockedSite);
+    } catch (error) {
+      console.error('Error saving to BlockedSitesDB:', error);
+    }
+  };
+
 
   const saveDetection = async (detection: Omit<DetectionItem, 'id'>): Promise<number> => {
     const db = await initDB();
@@ -255,6 +314,8 @@ export function GamblingProvider({children}: { children: ReactNode }) {
               score: result.score
             });
 
+            // BlockedSitesDB에도 저장
+            await saveToBlockedSitesDB(currentData[0].url, 10); // 10분 차단
 
             currentData[0].검출유무 = 1;
             sendNotification('inappropriate', '성인 콘텐츠가 감지되었습니다.');
@@ -274,6 +335,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
                 },
                 "*"
             );
+
 
           }
         }

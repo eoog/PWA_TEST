@@ -58,6 +58,15 @@ window.addEventListener("message", (event) => {
         {type: "block", data: event.data.data, duration: event.duration});
   }
 
+  // unblock 리스너 추가
+  if (event.data.type === "unblock" &&
+      event.data.identifier === EXTENSION_IDENTIFIER) {
+    chrome.runtime.sendMessage({
+      type: "unblock",
+      data: event.data.data
+    });
+  }
+
   return true
 });
 
@@ -82,12 +91,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "block" &&
       message.source === EXTENSION_IDENTIFIER) {
-    console.log(message)
-    // window.postMessage({
-    //     type: "block",
-    //     source: EXTENSION_IDENTIFIER,
-    //     data: message.data
-    // }, "*");
+    console.log(message);
+  }
+
+  // unblock 응답 리스너 추가
+  if (message.type === "unblock" &&
+      message.source === EXTENSION_IDENTIFIER) {
+    window.postMessage({
+      type: "unblock",
+      source: EXTENSION_IDENTIFIER,
+      data: message.data
+    }, "*");
   }
 
   return true

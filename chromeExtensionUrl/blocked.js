@@ -14,11 +14,9 @@ document.getElementById('unlock').addEventListener('click', async () => {
     });
 
     if (response.success) {
-      // 성공적으로 처리됨 - background.js에서 리다이렉트 처리
-    } else {
-      alert(response.error || '잘못된 비밀번호입니다.');
-      document.getElementById('password').value = '';
+
     }
+
   } catch (error) {
     console.error('Error:', error);
     alert('오류가 발생했습니다.');
