@@ -40,6 +40,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const processedUrls = useRef<Set<string>>(new Set());
   const {toast} = useToast();
+  
   const {setCapturedFile} = useScreenShare();
 
   class GamblingDetector {
@@ -372,7 +373,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
 
   return (
       <GamblingContext.Provider value={{urlHistory}}>
-        <YOLOv8/>
+        <YOLOv8 urlHistory={urlHistory}/>
         {children}
       </GamblingContext.Provider>
   );

@@ -5,8 +5,8 @@ import {Button} from "@/components/ui/button";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Clock, Unlock} from 'lucide-react';
 import {Input} from "@/components/ui/input"
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
-import {useForm} from "react-hook-form"
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from '@/components/ui/form';
+import {useForm, ControllerRenderProps, FieldValues} from "react-hook-form"
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,7 @@ export default function BlockedSitesList() {
 
   const initDB = async (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('BlockedSitesDB', 1); // 버전을 2로 증가
+      const request = indexedDB.open('BlockedSitesDB', 2); 
 
       request.onerror = () => {
         console.error("DB Error:", request.error);
@@ -254,7 +254,7 @@ export default function BlockedSitesList() {
                     <FormField
                         control={form.control}
                         name="url"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <FormItem>
                               <FormLabel>URL</FormLabel>
                               <FormControl>
@@ -267,7 +267,7 @@ export default function BlockedSitesList() {
                     <FormField
                         control={form.control}
                         name="duration"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <FormItem>
                               <FormLabel>차단 시간 (분)</FormLabel>
                               <FormControl>
