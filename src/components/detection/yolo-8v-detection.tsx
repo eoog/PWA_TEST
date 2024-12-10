@@ -25,7 +25,7 @@ interface NotificationOptions {
 // 상수 정의
 const CONSTANTS = {
   MODEL_PATH: '/nude.onnx',
-  CONF_THRESHOLD: 0.3,
+  CONF_THRESHOLD: 0.4,
   IOU_THRESHOLD: 0.7,
   INPUT_SIZE: 320,
   ALERT_COOLDOWN: 6000,
@@ -35,11 +35,12 @@ const CONSTANTS = {
 
 // YOLO 클래스 정의
 const YOLO_CLASSES = [
-  '여성 생식기 가리기',  '둔부 노출', '여성 유방 노출',
+  '여성 생식기 가리기','엉덩이 노출', '여성 유방 노출',
   '여성 생식기 노출', '남성 유방 노출', '항문 노출', '발 노출',
   '배 가리기', '발 가리기', '겨드랑이 가리기', '겨드랑이 노출',
   '남성 얼굴', '배 노출', '남성 생식기 노출', '항문 가리기',
-  '여성 유방 가리기', '둔부 가리기'
+  '여성 유방 가리기', '둔부 가리기',
+
 ];
 // '여성 얼굴',
 
@@ -53,7 +54,6 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const modelSessionRef = useRef<ort.InferenceSession | null>(null);
   const lastAlertTimeRef = useRef<number>(0);
-  const {toast} = useToast();
 
 
   // 알림 전송
