@@ -301,60 +301,72 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
     }
   }, []);
 
-  // 결과 처리 및 박스 그리기
-  const drawDetections = useCallback(async (canvas: HTMLCanvasElement, image: File, boxes: DetectionBox[]) => {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    const img = new Image();
+  const initBlcokDB = async (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('BlockedSitesDB', 2); // 버전을 2로 증가
 
-    img.onload = () => {
+      request.onerror = () => {
+        console.error("DB Error:", request.error);
+        reject(request.error);
+      };
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+      request.onsuccess = () => {
+        console.log("DB Opened successfully");
+        resolve(request.result);
+      };
 
-      let detectionFound = false;
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        console.log("Upgrading database...");
+        const db = (event.target as IDBOpenDBRequest).result;
 
-      boxes.forEach(box => {
-        const [x1, y1, x2, y2, label, confidence] = box;
-
-        if (YOLO_CLASSES.includes(label)) {
-          // 박스 그리기
-          ctx.strokeStyle = "#00FF00";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-
-          // 레이블 그리기
-          ctx.fillStyle = "#00FF00";
-          ctx.font = "18px serif";
-          const text = `${label} ${Math.round(confidence * 100)}%`;
-          const textWidth = ctx.measureText(text).width;
-
-          ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
-          ctx.fillStyle = "#000000";
-          ctx.fillText(text, x1 + 5, y1 - 5);
-
-          detectionFound = true;
+        // 기존 스토어가 있다면 삭제
+        if (db.objectStoreNames.contains('blockedSites')) {
+          db.deleteObjectStore('blockedSites');
         }
-      });
 
-      // 감지 시 알림 및 저장
-      if (detectionFound && Date.now() - lastAlertTimeRef.current > CONSTANTS.ALERT_COOLDOWN) {
-        const newImageData = canvas.toDataURL('image/png');
-        saveImageToDB('DetectionImageDB', newImageData);
-        handleMessage();
-        lastAlertTimeRef.current = Date.now();
-      }
+        // 새 스토어 생성
+        const store = db.createObjectStore('blockedSites', {
+          keyPath: 'url',
+          autoIncrement: false
+        });
 
-      URL.revokeObjectURL(img.src);
-    };
+        // 인덱스 생성
+        store.createIndex('blockedAt', 'blockedAt', {unique: false});
+        store.createIndex('unblockTime', 'unblockTime', {unique: false});
+        store.createIndex('duration', 'duration', {unique: false});
 
-    img.src = URL.createObjectURL(image);
-  }, []);
+        console.log("Store created:", store);
+      };
+    });
+  };
+  const saveToBlockedSitesDB = async (url: string, duration: number) => {
+    try {
+      const db = await initBlcokDB();
+      const transaction = db.transaction('blockedSites', 'readwrite');
+      const store = transaction.objectStore('blockedSites');
 
-  // 메시지 처리
-  const handleMessage = async () => {
+      const blockedSite = {
+        url,
+        blockedAt: new Date(),
+        unblockTime: new Date(Date.now() + duration * 60 * 1000),
+        duration: duration
+      };
+
+      await store.put(blockedSite);
+      console.log('Site saved to BlockedSitesDB:', blockedSite);
+    } catch (error) {
+      console.error('Error saving to BlockedSitesDB:', error);
+    }
+  };
+   // 메시지 처리
+   const handleMessage = async () => {
+    // 쿨다운 체크
+    if (Date.now() - lastAlertTimeRef.current <= CONSTANTS.ALERT_COOLDOWN) {
+      console.log('쿨다운 중입니다.');
+      return;
+    }
+    
     if (!urlHistory || urlHistory.length === 0) return;
     
     const currentUrl = urlHistory[0]?.url;
@@ -372,31 +384,74 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
         "*"
     );
 
-    // BlockedSitesDB에 저장
     try {
-        const db = await initializeDB('BlockedSitesDB');
-        const transaction = db.transaction('blockedSites', 'readwrite');
-        const store = transaction.objectStore('blockedSites');
+      await saveToBlockedSitesDB(currentUrl, 1); // 10분 차단
 
-        const blockedSite = {
-            url: currentUrl,
-            blockedAt: new Date(),
-            unblockTime: new Date(Date.now() + 1 * 60 * 1000), // 1분 차단
-            duration: 1
-        };
-
-        await store.put(blockedSite);
+        // 성공적으로 처리된 경우에만 알림 전송 및 쿨다운 시작
+        sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
+        lastAlertTimeRef.current = Date.now();
+        console.log('차단 처리 완료:', currentUrl);
     } catch (error) {
         console.error('Error saving to BlockedSitesDB:', error);
     }
-
-    sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
-    // toast({
-    //   title: "노출 콘텐츠 감지",
-    //   description: "노출 관련 컨텐츠가 검출되었습니다.",
-    //   variant: "destructive",
-    // });
   };
+
+  // 결과 처리 및 박스 그리기
+  const drawDetections = useCallback(async (canvas: HTMLCanvasElement, image: File, boxes: DetectionBox[]) => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      let detectionFound = false;
+      let detectedLabels: string[] = [];
+
+      boxes.forEach(box => {
+        const [x1, y1, x2, y2, label, confidence] = box;
+
+        if (YOLO_CLASSES.includes(label) && confidence > CONSTANTS.CONF_THRESHOLD) {
+          // 박스 그리기
+          ctx.strokeStyle = "#00FF00";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+          // 레이블 그리기
+          ctx.fillStyle = "#00FF00";
+          ctx.font = "18px serif";
+          const text = `${label} ${Math.round(confidence * 100)}%`;
+          const textWidth = ctx.measureText(text).width;
+
+          ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
+          ctx.fillStyle = "#000000";
+          ctx.fillText(text, x1 + 5, y1 - 5);
+
+          detectionFound = true;
+          detectedLabels.push(`${label} (${Math.round(confidence * 100)}%)`);
+        }
+      });
+
+      // 감지된 경우에만 handleMessage 호출
+      if (detectionFound) {
+        const newImageData = canvas.toDataURL('image/png');
+        saveImageToDB('DetectionImageDB', newImageData);
+        
+        // 쿨다운 체크를 handleMessage 내부로 이동
+        handleMessage();
+        console.log('감지된 객체들:', detectedLabels.join(', '));
+      }
+
+      URL.revokeObjectURL(img.src);
+    };
+
+    img.src = URL.createObjectURL(image);
+  }, [handleMessage]); // handleMessage를 의존성 배열에 추가
+
+ 
 
   // 새 이미지 처리
   const handleNewImage = async (file: File) => {
@@ -411,11 +466,6 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
       console.error('Image processing failed:', error);
     }
   };
-
- useEffect(() => {
-  handleMessage();
-
- }, []);
 
   // 초기화
   useEffect(() => {

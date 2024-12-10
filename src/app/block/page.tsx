@@ -42,7 +42,7 @@ export default function BlockedSitesList() {
 
   const initDB = async (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('BlockedSitesDB', 1); // 버전을 2로 증가
+      const request = indexedDB.open('BlockedSitesDB', 2); 
 
       request.onerror = () => {
         console.error("DB Error:", request.error);
