@@ -2,6 +2,8 @@
 import React, {useCallback, useEffect, useRef} from 'react';
 import * as ort from 'onnxruntime-web';
 import {useScreenShare} from "@/lib/provider/screen-share-context";
+import {UrlHistoryItem} from "@/lib/provider/gambling-context";
+import { useToast } from '@/hooks/use-toast';
 
 // 타입 정의
 type DetectionBox = [number, number, number, number, string, number];
@@ -33,19 +35,26 @@ const CONSTANTS = {
 
 // YOLO 클래스 정의
 const YOLO_CLASSES = [
-  '여성 생식기 가리기', '여성 얼굴', '둔부 노출', '여성 유방 노출',
+  '여성 생식기 가리기',  '둔부 노출', '여성 유방 노출',
   '여성 생식기 노출', '남성 유방 노출', '항문 노출', '발 노출',
   '배 가리기', '발 가리기', '겨드랑이 가리기', '겨드랑이 노출',
   '남성 얼굴', '배 노출', '남성 생식기 노출', '항문 가리기',
   '여성 유방 가리기', '둔부 가리기'
 ];
+// '여성 얼굴',
 
-const YOLOv8 = () => {
+// props 타입 정의 추가
+interface YOLOv8Props {
+  urlHistory?: UrlHistoryItem[];
+}
+
+const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
   const {capturedFile} = useScreenShare();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const modelSessionRef = useRef<ort.InferenceSession | null>(null);
   const lastAlertTimeRef = useRef<number>(0);
-  
+  const {toast} = useToast();
+
 
   // 알림 전송
   const sendNotification = async (type: NotificationType, message: string) => {
@@ -346,7 +355,47 @@ const YOLOv8 = () => {
 
   // 메시지 처리
   const handleMessage = async () => {
+    if (!urlHistory || urlHistory.length === 0) return;
+    
+    const currentUrl = urlHistory[0]?.url;
+    if (!currentUrl) return;
+
+    // 차단 메시지 전송
+    window.postMessage(
+        {
+            type: "block",
+            source: "block",
+            identifier: 'URL_HISTORY_TRACKER_f7e8d9c6b5a4',
+            data: currentUrl,
+            duration: '1'
+        },
+        "*"
+    );
+
+    // BlockedSitesDB에 저장
+    try {
+        const db = await initializeDB('BlockedSitesDB');
+        const transaction = db.transaction('blockedSites', 'readwrite');
+        const store = transaction.objectStore('blockedSites');
+
+        const blockedSite = {
+            url: currentUrl,
+            blockedAt: new Date(),
+            unblockTime: new Date(Date.now() + 1 * 60 * 1000), // 1분 차단
+            duration: 1
+        };
+
+        await store.put(blockedSite);
+    } catch (error) {
+        console.error('Error saving to BlockedSitesDB:', error);
+    }
+
     sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
+    // toast({
+    //   title: "노출 콘텐츠 감지",
+    //   description: "노출 관련 컨텐츠가 검출되었습니다.",
+    //   variant: "destructive",
+    // });
   };
 
   // 새 이미지 처리
@@ -363,6 +412,11 @@ const YOLOv8 = () => {
     }
   };
 
+ useEffect(() => {
+  handleMessage();
+
+ }, []);
+
   // 초기화
   useEffect(() => {
     initializeModel();
@@ -373,7 +427,9 @@ const YOLOv8 = () => {
   useEffect(() => {
     if (capturedFile) {
       handleNewImage(capturedFile);
+    
     }
+   
   }, [capturedFile, handleNewImage]);
 
   return (

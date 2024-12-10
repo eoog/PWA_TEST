@@ -372,7 +372,7 @@ export function GamblingProvider({children}: { children: ReactNode }) {
 
   return (
       <GamblingContext.Provider value={{urlHistory}}>
-        <YOLOv8/>
+        <YOLOv8 urlHistory={urlHistory}/>
         {children}
       </GamblingContext.Provider>
   );
