@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import * as ort from 'onnxruntime-web';
 import {useScreenShare} from "@/lib/provider/screen-share-context";
 import {UrlHistoryItem} from "@/lib/provider/gambling-context";
-import { useToast } from '@/hooks/use-toast';
+import {useToast} from '@/hooks/use-toast';
 
 // 타입 정의
 type DetectionBox = [number, number, number, number, string, number];
@@ -25,7 +25,7 @@ interface NotificationOptions {
 // 상수 정의
 const CONSTANTS = {
   MODEL_PATH: '/nude.onnx',
-  CONF_THRESHOLD: 0.3,
+  CONF_THRESHOLD: 0.5,
   IOU_THRESHOLD: 0.7,
   INPUT_SIZE: 320,
   ALERT_COOLDOWN: 6000,
@@ -35,11 +35,24 @@ const CONSTANTS = {
 
 // YOLO 클래스 정의
 const YOLO_CLASSES = [
-  '여성 생식기 가리기',  '둔부 노출', '여성 유방 노출',
-  '여성 생식기 노출', '남성 유방 노출', '항문 노출', '발 노출',
-  '배 가리기', '발 가리기', '겨드랑이 가리기', '겨드랑이 노출',
-  '남성 얼굴', '배 노출', '남성 생식기 노출', '항문 가리기',
-  '여성 유방 가리기', '둔부 가리기'
+  '여성 생식기 가리기',
+  '여성 얼굴',
+  '둔부 노출',
+  '여성 유방 노출',
+  '여성 생식기 노출',
+  '남성 유방 노출',
+  '항문 노출',
+  '발 노출',
+  '배 가리기',
+  '발 가리기',
+  '겨드랑이 가리기',
+  '겨드랑이 노출',
+  '남성 얼굴',
+  '배 노출',
+  '남성 생식기 노출',
+  '항문 가리기',
+  '여성 유방 가리기',
+  '둔부 가리기'
 ];
 // '여성 얼굴',
 
@@ -48,7 +61,7 @@ interface YOLOv8Props {
   urlHistory?: UrlHistoryItem[];
 }
 
-const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
+const YOLOv8 = ({urlHistory = []}: YOLOv8Props) => {
   const {capturedFile} = useScreenShare();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const modelSessionRef = useRef<ort.InferenceSession | null>(null);
@@ -201,38 +214,48 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
 
   // 출력 처리
   const processOutputs = (output: Float32Array, imgWidth: number, imgHeight: number): DetectionBox[] => {
-    const boxes: DetectionBox[] = [];
-    const numBoxes = CONSTANTS.NUM_BOXES;
-    const numClasses = YOLO_CLASSES.length;
+    let boxes: DetectionBox[] = [];
 
-    for (let i = 0; i < numBoxes; i++) {
-      let maxProb = 0;
-      let classId = 0;
+    for (let index = 0; index < 2100; index++) {
+      // 클래스 수를 실제 YOLO_CLASSES 길이에 맞춤
+      const [classId, prob] = [...Array(YOLO_CLASSES.length).keys()]
+      .map(col => [col, output[2100 * (col + 4) + index]])
+      .reduce((accum, item) => item[1] > accum[1] ? item : accum, [0, 0]);
 
-      for (let j = 0; j < numClasses; j++) {
-        const prob = output[numBoxes * (j + 4) + i];
-        if (prob > maxProb) {
-          maxProb = prob;
-          classId = j;
-        }
+      if (prob < CONSTANTS.CONF_THRESHOLD) {
+        continue;
       }
 
-      if (maxProb < CONSTANTS.CONF_THRESHOLD) continue;
+      // classId가 YOLO_CLASSES 범위를 벗어나지 않도록 확인
+      if (classId >= YOLO_CLASSES.length) {
+        continue;
+      }
 
-      const xc = output[i];
-      const yc = output[numBoxes + i];
-      const w = output[2 * numBoxes + i];
-      const h = output[3 * numBoxes + i];
+      const label = YOLO_CLASSES[classId];
+      const xc = output[index];
+      const yc = output[2100 + index];
+      const w = output[2 * 2100 + index];
+      const h = output[3 * 2100 + index];
 
-      const x1 = (xc - w / 2) / CONSTANTS.INPUT_SIZE * imgWidth;
-      const y1 = (yc - h / 2) / CONSTANTS.INPUT_SIZE * imgHeight;
-      const x2 = (xc + w / 2) / CONSTANTS.INPUT_SIZE * imgWidth;
-      const y2 = (yc + h / 2) / CONSTANTS.INPUT_SIZE * imgHeight;
+      const x1 = (xc - w / 2) / 320 * imgWidth;
+      const y1 = (yc - h / 2) / 320 * imgHeight;
+      const x2 = (xc + w / 2) / 320 * imgWidth;
+      const y2 = (yc + h / 2) / 320 * imgHeight;
 
-      boxes.push([x1, y1, x2, y2, YOLO_CLASSES[classId], maxProb]);
+      console.log(`Detection: ${label} (${prob.toFixed(3)}) at [${x1.toFixed(1)}, ${y1.toFixed(1)}, ${x2.toFixed(1)}, ${y2.toFixed(1)}]`);
+      boxes.push([x1, y1, x2, y2, label, prob]);
     }
 
-    return nonMaxSuppression(boxes, CONSTANTS.IOU_THRESHOLD);
+    // NMS 적용
+    boxes = boxes.sort((box1, box2) => box2[5] - box1[5]);
+    const result = [];
+
+    while (boxes.length > 0) {
+      result.push(boxes[0]);
+      boxes = boxes.filter(box => calculateIoU(boxes[0], box) < CONSTANTS.IOU_THRESHOLD);
+    }
+
+    return result;
   };
 
   // NMS 구현
@@ -258,22 +281,22 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
     return selected;
   };
 
-  // IoU 계산
+// IoU 계산 함수 수정
   const calculateIoU = (box1: DetectionBox, box2: DetectionBox): number => {
-    const [x1_1, y1_1, x2_1, y2_1] = box1;
-    const [x1_2, y1_2, x2_2, y2_2] = box2;
+    const [box1_x1, box1_y1, box1_x2, box1_y2] = box1;
+    const [box2_x1, box2_y1, box2_x2, box2_y2] = box2;
 
-    const x_left = Math.max(x1_1, x1_2);
-    const y_top = Math.max(y1_1, y1_2);
-    const x_right = Math.min(x2_1, x2_2);
-    const y_bottom = Math.min(y2_1, y2_2);
+    const x1 = Math.max(box1_x1, box2_x1);
+    const y1 = Math.max(box1_y1, box2_y1);
+    const x2 = Math.min(box1_x2, box2_x2);
+    const y2 = Math.min(box1_y2, box2_y2);
 
-    if (x_right < x_left || y_bottom < y_top) return 0;
+    if (x2 < x1 || y2 < y1) return 0;
 
-    const intersection = (x_right - x_left) * (y_bottom - y_top);
-    const area1 = (x2_1 - x1_1) * (y2_1 - y1_1);
-    const area2 = (x2_2 - x1_2) * (y2_2 - y1_2);
-    const union = area1 + area2 - intersection;
+    const intersection = (x2 - x1) * (y2 - y1);
+    const box1_area = (box1_x2 - box1_x1) * (box1_y2 - box1_y1);
+    const box2_area = (box2_x2 - box2_x1) * (box2_y2 - box2_y1);
+    const union = box1_area + box2_area - intersection;
 
     return intersection / union;
   };
@@ -359,27 +382,27 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
       console.error('Error saving to BlockedSitesDB:', error);
     }
   };
-   // 메시지 처리
-   const handleMessage = async () => {
+  // 메시지 처리
+  const handleMessage = async () => {
     // 쿨다운 체크
     if (Date.now() - lastAlertTimeRef.current <= CONSTANTS.ALERT_COOLDOWN) {
       console.log('쿨다운 중입니다.');
       return;
     }
-    
+
     if (!urlHistory || urlHistory.length === 0) return;
-    
+
     const currentUrl = urlHistory[0]?.url;
     if (!currentUrl) return;
 
     // 차단 메시지 전송
     window.postMessage(
         {
-            type: "block",
-            source: "block",
-            identifier: 'URL_HISTORY_TRACKER_f7e8d9c6b5a4',
-            data: currentUrl,
-            duration: '1'
+          type: "block",
+          source: "block",
+          identifier: 'URL_HISTORY_TRACKER_f7e8d9c6b5a4',
+          data: currentUrl,
+          duration: '1'
         },
         "*"
     );
@@ -387,12 +410,12 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
     try {
       await saveToBlockedSitesDB(currentUrl, 1); // 10분 차단
 
-        // 성공적으로 처리된 경우에만 알림 전송 및 쿨다운 시작
-        sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
-        lastAlertTimeRef.current = Date.now();
-        console.log('차단 처리 완료:', currentUrl);
+      // 성공적으로 처리된 경우에만 알림 전송 및 쿨다운 시작
+      sendNotification('adult', '성인 콘텐츠가 감지되었습니다.');
+      lastAlertTimeRef.current = Date.now();
+      console.log('차단 처리 완료:', currentUrl);
     } catch (error) {
-        console.error('Error saving to BlockedSitesDB:', error);
+      console.error('Error saving to BlockedSitesDB:', error);
     }
   };
 
@@ -414,32 +437,30 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
       boxes.forEach(box => {
         const [x1, y1, x2, y2, label, confidence] = box;
 
-        if (YOLO_CLASSES.includes(label) && confidence > CONSTANTS.CONF_THRESHOLD) {
-          // 박스 그리기
-          ctx.strokeStyle = "#00FF00";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        // 박스 그리기
+        ctx.strokeStyle = "#00FF00";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-          // 레이블 그리기
-          ctx.fillStyle = "#00FF00";
-          ctx.font = "18px serif";
-          const text = `${label} ${Math.round(confidence * 100)}%`;
-          const textWidth = ctx.measureText(text).width;
+        // 레이블 그리기
+        ctx.fillStyle = "#00FF00";
+        ctx.font = "18px serif";
+        const text = `${label} ${Math.round(confidence * 100)}%`;
+        const textWidth = ctx.measureText(text).width;
 
-          ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
-          ctx.fillStyle = "#000000";
-          ctx.fillText(text, x1 + 5, y1 - 5);
+        ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
+        ctx.fillStyle = "#000000";
+        ctx.fillText(text, x1 + 5, y1 - 5);
 
-          detectionFound = true;
-          detectedLabels.push(`${label} (${Math.round(confidence * 100)}%)`);
-        }
+        detectionFound = true;
+        detectedLabels.push(`${label} (${Math.round(confidence * 100)}%)`);
       });
 
       // 감지된 경우에만 handleMessage 호출
       if (detectionFound) {
         const newImageData = canvas.toDataURL('image/png');
         saveImageToDB('DetectionImageDB', newImageData);
-        
+
         // 쿨다운 체크를 handleMessage 내부로 이동
         handleMessage();
         console.log('감지된 객체들:', detectedLabels.join(', '));
@@ -451,7 +472,6 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
     img.src = URL.createObjectURL(image);
   }, [handleMessage]); // handleMessage를 의존성 배열에 추가
 
- 
 
   // 새 이미지 처리
   const handleNewImage = async (file: File) => {
@@ -477,9 +497,9 @@ const YOLOv8 = ({ urlHistory = [] }: YOLOv8Props) => {
   useEffect(() => {
     if (capturedFile) {
       handleNewImage(capturedFile);
-    
+
     }
-   
+
   }, [capturedFile, handleNewImage]);
 
   return (
